@@ -204,6 +204,42 @@
         .issue-badge.danger { background: rgba(239,68,68,0.15); color: #f87171; }
         .issue-badge.warning { background: rgba(234,179,8,0.15); color: #fbbf24; }
         .issue-badge.info { background: rgba(99,102,241,0.15); color: var(--accent-hover); }
+
+        /* Wizard steps */
+        .wizard-step { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; background: var(--bg-tertiary); color: var(--text-muted); }
+        .wizard-step.active { background: var(--accent); color: white; }
+        .wizard-step.done { background: var(--success); color: white; }
+
+        /* Proposal cards */
+        .proposal-card { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 10px; transition: border-color 0.2s; }
+        .proposal-card.accepted { border-color: var(--success); }
+        .proposal-card.rejected { border-color: var(--danger); opacity: 0.6; }
+        .proposal-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+        .proposal-card-title { font-size: 14px; font-weight: 600; }
+        .proposal-card-why { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .proposal-card-diff { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .proposal-diff-box { padding: 8px 10px; border-radius: 6px; font-family: monospace; font-size: 11px; line-height: 1.5; max-height: 150px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+        .proposal-diff-before { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+        .proposal-diff-after { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); color: #86efac; }
+        .proposal-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .proposal-btn { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; border: none; cursor: pointer; font-family: inherit; touch-action: manipulation; }
+        .proposal-btn-accept { background: rgba(34,197,94,0.15); color: #4ade80; }
+        .proposal-btn-accept:hover { background: rgba(34,197,94,0.25); }
+        .proposal-btn-accept.active { background: var(--success); color: white; }
+        .proposal-btn-reject { background: rgba(239,68,68,0.15); color: #f87171; }
+        .proposal-btn-reject:hover { background: rgba(239,68,68,0.25); }
+        .proposal-btn-reject.active { background: var(--danger); color: white; }
+        .proposal-btn-edit { background: rgba(99,102,241,0.15); color: var(--accent-hover); }
+        .proposal-btn-edit:hover { background: rgba(99,102,241,0.25); }
+        .proposal-textarea { width: 100%; min-height: 80px; margin-top: 8px; padding: 8px; background: var(--bg-primary); border: 1px solid var(--accent); border-radius: 6px; color: var(--text-primary); font-family: monospace; font-size: 12px; resize: vertical; outline: none; }
+        .proposal-counter { text-align: center; padding: 10px; font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+        .proposal-counter b { color: var(--success); }
+        .proposal-auto { font-size: 10px; background: rgba(34,197,94,0.15); color: #4ade80; padding: 2px 8px; border-radius: 10px; }
+
+        @media (max-width: 768px) {
+            .proposal-card-diff { grid-template-columns: 1fr; }
+            .modal { max-height: 95vh; max-height: 95dvh; border-radius: 12px; }
+        }
         .stats-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
         .stat-chip { background: var(--bg-tertiary); padding: 6px 12px; border-radius: 8px; font-size: 12px; color: var(--text-secondary); }
         .stat-chip b { color: var(--text-primary); }
@@ -312,12 +348,22 @@
     </div>
 </div>
 
-<!-- ANALYZE MODAL -->
+<!-- ANALYZE/IMPROVE WIZARD -->
 <div class="modal-overlay" id="analyze-modal">
     <div class="modal">
-        <div class="modal-header"><span class="modal-title">✨ Analyse & Amélioration</span><button class="modal-close" onclick="closeAnalyze()">✕</button></div>
-        <div class="modal-body" id="analyze-body"><div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Analyse en cours...</div></div>
-        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeAnalyze()">Fermer</button></div>
+        <div class="modal-header">
+            <span class="modal-title" id="wizard-title">✨ Analyse & Amélioration</span>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="display:flex;gap:4px;" id="wizard-steps">
+                    <span class="wizard-step active" id="ws1">1</span>
+                    <span class="wizard-step" id="ws2">2</span>
+                    <span class="wizard-step" id="ws3">3</span>
+                </div>
+                <button class="modal-close" onclick="closeAnalyze()">✕</button>
+            </div>
+        </div>
+        <div class="modal-body" id="analyze-body"></div>
+        <div class="modal-footer" id="wizard-footer"></div>
     </div>
 </div>
 
@@ -452,20 +498,226 @@ async function restoreVersion(){
 }
 function closeHistory(){document.getElementById('history-panel').classList.remove('open');}
 
-// ===== ANALYZE =====
-async function openAnalyze(){
-    if(S.activeTab===null)return;const t=S.openTabs[S.activeTab];
+// ===== IMPROVE WIZARD =====
+const W = { step: 1, analysis: null, proposals: [], decisions: {} };
+
+function setWizardStep(n) {
+    W.step = n;
+    [1,2,3].forEach(i => {
+        const el = document.getElementById(`ws${i}`);
+        el.className = 'wizard-step' + (i === n ? ' active' : i < n ? ' done' : '');
+    });
+    document.getElementById('wizard-title').textContent = n === 1 ? '✨ Étape 1 — Diagnostic' : n === 2 ? '✨ Étape 2 — Propositions' : '✨ Étape 3 — Appliquer';
+}
+
+async function openAnalyze() {
+    if (S.activeTab === null) return;
+    W.step = 1; W.proposals = []; W.decisions = {};
     document.getElementById('analyze-modal').classList.add('open');
-    document.getElementById('analyze-body').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Analyse en cours...</div>';
-    try{const r=await(await apiFetch(`${API}/agents/${t.agent_id}/analyze/${t.file_path}`)).json();
-    const scoreClass=r.score>=80?'score-good':r.score>=50?'score-ok':'score-bad';
-    const scoreLabel=r.score>=80?'Bon fichier !':r.score>=50?'Peut être amélioré':'À retravailler';
-    let html=`<div class="score-ring ${scoreClass}">${r.score}</div><div class="score-label">${scoreLabel}</div>`;
-    html+=`<div class="stats-row"><div class="stat-chip"><b>${r.stats.characters}</b> caractères</div><div class="stat-chip"><b>${r.stats.lines}</b> lignes</div><div class="stat-chip"><b>${r.stats.words}</b> mots</div><div class="stat-chip"><b>${r.stats.headers}</b> sections</div></div>`;
-    if(r.issues.length){html+=r.issues.map(i=>`<div class="issue-item"><div class="issue-icon">${i.icon}</div><div class="issue-content"><div class="issue-title">${i.title}</div><div class="issue-desc">${i.desc}</div><span class="issue-badge ${i.severity}">${i.severity==='danger'?'Critique':i.severity==='warning'?'Attention':'Info'}</span></div></div>`).join('');}
-    else{html+='<div style="text-align:center;padding:20px;color:var(--success)">✅ Aucun problème détecté !</div>';}
-    document.getElementById('analyze-body').innerHTML=html;
-    }catch(e){document.getElementById('analyze-body').innerHTML=`<div style="color:var(--danger);padding:20px">Erreur: ${e.message}</div>`;}
+    setWizardStep(1);
+    
+    // Étape 1: Diagnostic
+    const t = S.openTabs[S.activeTab];
+    document.getElementById('analyze-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Analyse en cours...</div>';
+    document.getElementById('wizard-footer').innerHTML = '';
+    
+    try {
+        const r = await (await apiFetch(`${API}/agents/${t.agent_id}/analyze/${t.file_path}`)).json();
+        W.analysis = r;
+        const sc = r.score >= 80 ? 'score-good' : r.score >= 50 ? 'score-ok' : 'score-bad';
+        const sl = r.score >= 80 ? 'Bon fichier !' : r.score >= 50 ? 'Peut être amélioré' : 'À retravailler';
+        let h = `<div class="score-ring ${sc}">${r.score}</div><div class="score-label">${sl}</div>`;
+        h += `<div class="stats-row"><div class="stat-chip"><b>${r.stats.characters}</b> chars</div><div class="stat-chip"><b>${r.stats.lines}</b> lignes</div><div class="stat-chip"><b>${r.stats.words}</b> mots</div><div class="stat-chip"><b>${r.stats.headers}</b> sections</div></div>`;
+        if (r.issues.length) {
+            h += r.issues.map(i => `<div class="issue-item"><div class="issue-icon">${i.icon}</div><div class="issue-content"><div class="issue-title">${i.title}</div><div class="issue-desc">${i.desc}</div><span class="issue-badge ${i.severity}">${i.severity === 'danger' ? 'Critique' : i.severity === 'warning' ? 'Attention' : 'Info'}</span></div></div>`).join('');
+        } else {
+            h += '<div style="text-align:center;padding:20px;color:var(--success)">✅ Aucun problème détecté !</div>';
+        }
+        document.getElementById('analyze-body').innerHTML = h;
+        document.getElementById('wizard-footer').innerHTML = `<button class="btn btn-secondary" onclick="closeAnalyze()">Fermer</button><button class="btn btn-primary" onclick="wizardStep2()">Générer les améliorations →</button>`;
+    } catch (e) {
+        document.getElementById('analyze-body').innerHTML = `<div style="color:var(--danger);padding:20px">Erreur: ${e.message}</div>`;
+        document.getElementById('wizard-footer').innerHTML = `<button class="btn btn-secondary" onclick="closeAnalyze()">Fermer</button>`;
+    }
+}
+
+async function wizardStep2() {
+    if (S.activeTab === null) return;
+    setWizardStep(2);
+    const t = S.openTabs[S.activeTab];
+    document.getElementById('analyze-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Génération des propositions...</div>';
+    document.getElementById('wizard-footer').innerHTML = '';
+    
+    try {
+        const r = await (await apiFetch(`${API}/agents/${t.agent_id}/improve/${t.file_path}`)).json();
+        W.proposals = r.proposals;
+        
+        // Auto-accept les propositions auto
+        W.proposals.forEach(p => { W.decisions[p.id] = p.auto_accept ? 'accepted' : null; });
+        
+        if (!W.proposals.length) {
+            document.getElementById('analyze-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--success)">✅ Aucune amélioration à proposer — le fichier est déjà bien optimisé !</div>';
+            document.getElementById('wizard-footer').innerHTML = `<button class="btn btn-secondary" onclick="closeAnalyze()">Fermer</button>`;
+            return;
+        }
+        
+        renderProposals();
+        document.getElementById('wizard-footer').innerHTML = `<button class="btn btn-secondary" onclick="openAnalyze()">← Diagnostic</button><button class="btn btn-primary" id="btn-wizard-next" onclick="wizardStep3()">Voir le résultat →</button>`;
+    } catch (e) {
+        document.getElementById('analyze-body').innerHTML = `<div style="color:var(--danger);padding:20px">Erreur: ${e.message}</div>`;
+        document.getElementById('wizard-footer').innerHTML = `<button class="btn btn-secondary" onclick="closeAnalyze()">Fermer</button>`;
+    }
+}
+
+function renderProposals() {
+    const accepted = Object.values(W.decisions).filter(v => v === 'accepted').length;
+    const total = W.proposals.length;
+    
+    let h = `<div class="proposal-counter"><b>${accepted}</b> / ${total} propositions acceptées</div>`;
+    
+    h += W.proposals.map(p => {
+        const state = W.decisions[p.id];
+        const cardClass = state === 'accepted' ? 'accepted' : state === 'rejected' ? 'rejected' : '';
+        const editing = state === 'editing';
+        
+        return `<div class="proposal-card ${cardClass}" id="pc-${p.id}">
+            <div class="proposal-card-header">
+                <div class="proposal-card-title">${p.title}</div>
+                <div>${p.auto_accept && state === 'accepted' ? '<span class="proposal-auto">Auto-corrigé</span>' : ''}<span class="issue-badge ${p.severity}">${p.severity === 'danger' ? '🔴' : p.severity === 'warning' ? '🟡' : '🔵'}</span></div>
+            </div>
+            <div class="proposal-card-why">${p.why}</div>
+            <div class="proposal-card-diff">
+                <div class="proposal-diff-box proposal-diff-before"><b style="color:#f87171">AVANT :</b>\n${esc(p.before)}</div>
+                <div class="proposal-diff-box proposal-diff-after"><b style="color:#4ade80">APRÈS :</b>\n${esc(editing ? (W.decisions[p.id + '_text'] || p.after) : p.after)}</div>
+            </div>
+            ${editing ? `<textarea class="proposal-textarea" id="edit-${p.id}" oninput="W.decisions['${p.id}_text']=this.value">${esc(W.decisions[p.id + '_text'] || p.after)}</textarea>` : ''}
+            <div class="proposal-actions">
+                <button class="proposal-btn proposal-btn-accept ${state === 'accepted' ? 'active' : ''}" onclick="setDecision('${p.id}','accepted')">✅ Accepter</button>
+                <button class="proposal-btn proposal-btn-reject ${state === 'rejected' ? 'active' : ''}" onclick="setDecision('${p.id}','rejected')">❌ Refuser</button>
+                ${p.editable ? `<button class="proposal-btn proposal-btn-edit" onclick="toggleEdit('${p.id}')">✏️ Modifier</button>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+    
+    document.getElementById('analyze-body').innerHTML = h;
+}
+
+function setDecision(id, value) {
+    W.decisions[id] = value;
+    renderProposals();
+}
+
+function toggleEdit(id) {
+    if (W.decisions[id] === 'editing') {
+        W.decisions[id] = 'accepted';
+    } else {
+        W.decisions[id] = 'editing';
+        if (!W.decisions[id + '_text']) {
+            const p = W.proposals.find(p => p.id === id);
+            W.decisions[id + '_text'] = p ? p.after : '';
+        }
+    }
+    renderProposals();
+}
+
+async function wizardStep3() {
+    // Vérifier qu'au moins 1 proposition est acceptée
+    const accepted = W.proposals.filter(p => W.decisions[p.id] === 'accepted' || W.decisions[p.id] === 'editing');
+    if (!accepted.length) {
+        toast('Accepte au moins une proposition', 'error');
+        return;
+    }
+    
+    setWizardStep(3);
+    const t = S.openTabs[S.activeTab];
+    
+    // Construire les décisions
+    const decisions = W.proposals.map(p => ({
+        id: p.id,
+        accepted: W.decisions[p.id] === 'accepted' || W.decisions[p.id] === 'editing',
+        custom_text: W.decisions[p.id + '_text'] || null,
+    }));
+    
+    const acceptedCount = decisions.filter(d => d.accepted).length;
+    const rejectedCount = decisions.filter(d => !d.accepted).length;
+    
+    // Preview
+    let h = `<div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:32px;margin-bottom:8px;">📋</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px;">${acceptedCount} amélioration(s) à appliquer</div>
+        <div style="font-size:12px;color:var(--text-muted)">${rejectedCount} refusée(s)</div>
+    </div>`;
+    
+    h += `<div style="margin-bottom:12px;">`;
+    decisions.forEach(d => {
+        const p = W.proposals.find(p => p.id === d.id);
+        if (!p) return;
+        const icon = d.accepted ? '✅' : '❌';
+        const color = d.accepted ? 'var(--success)' : 'var(--text-muted)';
+        h += `<div style="padding:6px 0;font-size:13px;color:${color};${d.accepted ? '' : 'opacity:0.5;text-decoration:line-through;'}">${icon} ${p.title}</div>`;
+    });
+    h += `</div>`;
+    
+    h += `<div style="padding:12px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.2);border-radius:8px;font-size:12px;color:#fbbf24;text-align:center;">
+        🔒 Un backup sera automatiquement créé avant modification
+    </div>`;
+    
+    document.getElementById('analyze-body').innerHTML = h;
+    document.getElementById('wizard-footer').innerHTML = `<button class="btn btn-secondary" onclick="wizardStep2()">← Retour</button><button class="btn btn-success" onclick="applyImprovements()" style="font-size:14px;padding:10px 24px;">✅ Appliquer les améliorations</button>`;
+}
+
+async function applyImprovements() {
+    if (S.activeTab === null) return;
+    const t = S.openTabs[S.activeTab];
+    
+    const decisions = W.proposals.map(p => ({
+        id: p.id,
+        accepted: W.decisions[p.id] === 'accepted' || W.decisions[p.id] === 'editing',
+        custom_text: W.decisions[p.id + '_text'] || null,
+    }));
+    
+    document.getElementById('analyze-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Application en cours...</div>';
+    document.getElementById('wizard-footer').innerHTML = '';
+    
+    try {
+        const r = await (await apiFetch(`${API}/agents/${t.agent_id}/apply-improve/${t.file_path}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ decisions }),
+        })).json();
+        
+        // Mettre à jour l'éditeur
+        S.editor.setValue(r.content);
+        t.original = r.content;
+        t.modified = r.content;
+        renderTabs();
+        updateSaveBtn();
+        
+        // Afficher le résultat
+        let h = `<div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:48px;margin-bottom:8px;">🎉</div>
+            <div style="font-size:18px;font-weight:700;color:var(--success);margin-bottom:4px;">${r.message}</div>
+            <div style="font-size:13px;color:var(--text-secondary)">${r.accepted} acceptée(s), ${r.rejected} refusée(s)</div>
+        </div>`;
+        
+        if (r.diff.length) {
+            h += `<div class="history-diff" style="display:block;max-height:250px;">`;
+            h += r.diff.map(l => {
+                if (l.startsWith('+')) return `<div class="diff-add">${esc(l)}</div>`;
+                if (l.startsWith('-')) return `<div class="diff-del">${esc(l)}</div>`;
+                if (l.startsWith('@')) return `<div class="diff-info">${esc(l)}</div>`;
+                return `<div>${esc(l)}</div>`;
+            }).join('');
+            h += `</div>`;
+        }
+        
+        document.getElementById('analyze-body').innerHTML = h;
+        document.getElementById('wizard-footer').innerHTML = `<button class="btn btn-primary" onclick="closeAnalyze()">Terminé ✓</button>`;
+        toast(r.message, 'success');
+    } catch (e) {
+        document.getElementById('analyze-body').innerHTML = `<div style="color:var(--danger);padding:20px">Erreur: ${e.message}</div>`;
+        document.getElementById('wizard-footer').innerHTML = `<button class="btn btn-secondary" onclick="wizardStep2()">← Retour</button>`;
+    }
 }
 function closeAnalyze(){document.getElementById('analyze-modal').classList.remove('open');}
 

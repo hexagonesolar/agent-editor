@@ -459,6 +459,76 @@ def api_analyze(agent_id: str, file_path: str, user: dict = Depends(get_current_
     return analyze_file(file_path, content)
 
 
+# === IMPROVE ===
+from api.improve_engine import generate_proposals, apply_proposals
+
+@app.get("/api/agents/{agent_id}/improve/{file_path:path}")
+def api_improve(agent_id: str, file_path: str, user: dict = Depends(get_current_user)):
+    """Génère les propositions d'amélioration pour un fichier."""
+    agent = CONNECTED_AGENTS.get(agent_id)
+    if not agent:
+        raise HTTPException(404)
+    filepath = agent["base_path"] / file_path
+    if not filepath.exists():
+        raise HTTPException(404)
+    content = filepath.read_text(encoding="utf-8")
+    proposals = generate_proposals(file_path, content)
+    return {"proposals": proposals, "original": content}
+
+
+class ImproveDecision(BaseModel):
+    id: str
+    accepted: bool
+    custom_text: Optional[str] = None
+
+class ApplyImproveRequest(BaseModel):
+    decisions: list[ImproveDecision]
+
+@app.post("/api/agents/{agent_id}/apply-improve/{file_path:path}")
+def api_apply_improve(agent_id: str, file_path: str, req: ApplyImproveRequest, user: dict = Depends(get_current_user)):
+    """Applique les propositions acceptées au fichier."""
+    agent = CONNECTED_AGENTS.get(agent_id)
+    if not agent:
+        raise HTTPException(404)
+    filepath = agent["base_path"] / file_path
+    if not filepath.exists():
+        raise HTTPException(404)
+    
+    original = filepath.read_text(encoding="utf-8")
+    
+    # Regénérer les propositions pour avoir les métadonnées
+    proposals = generate_proposals(file_path, original)
+    
+    # Appliquer
+    decisions = [d.model_dump() for d in req.decisions]
+    new_content = apply_proposals(original, proposals, decisions)
+    
+    # Backup via versioning
+    save_version(agent_id, file_path, original)
+    
+    # Écriture
+    filepath.write_text(new_content, encoding="utf-8")
+    
+    # Diff
+    diff_lines = list(difflib.unified_diff(
+        original.splitlines(keepends=True),
+        new_content.splitlines(keepends=True),
+        fromfile="avant", tofile="après", lineterm=""
+    ))
+    
+    accepted = sum(1 for d in decisions if d["accepted"])
+    rejected = sum(1 for d in decisions if not d["accepted"])
+    
+    return {
+        "status": "ok",
+        "content": new_content,
+        "diff": diff_lines,
+        "accepted": accepted,
+        "rejected": rejected,
+        "message": f"✅ {accepted} amélioration(s) appliquée(s) (backup créé)",
+    }
+
+
 # === SEARCH ===
 
 @app.get("/api/search")
