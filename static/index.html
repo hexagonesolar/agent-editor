@@ -425,6 +425,71 @@
 
         #editor-container { flex: 1; overflow: hidden; }
 
+        /* File info banner */
+        .file-info-banner {
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: none;
+            gap: 16px;
+            align-items: flex-start;
+            animation: fadeIn 0.2s ease;
+        }
+        .file-info-banner.show { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .file-info-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+        .file-info-content { flex: 1; min-width: 0; }
+        .file-info-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        .file-info-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .file-info-tips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .file-info-tip {
+            font-size: 11px;
+            padding: 3px 10px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            color: var(--accent-hover);
+            white-space: nowrap;
+        }
+        .file-info-tip.warning {
+            background: rgba(234, 179, 8, 0.1);
+            border-color: rgba(234, 179, 8, 0.2);
+            color: #fbbf24;
+        }
+        .file-info-tip.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+        .file-info-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .file-info-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+
         .empty-state {
             display: flex;
             flex-direction: column;
@@ -536,6 +601,15 @@
                     <button class="btn btn-secondary" id="btn-revert" onclick="revertFile()">↩ Annuler</button>
                     <button class="btn btn-primary" id="btn-save" onclick="saveFile()" disabled>💾 Sauvegarder</button>
                 </div>
+            </div>
+            <div class="file-info-banner" id="file-info-banner">
+                <span class="file-info-icon" id="file-info-icon"></span>
+                <div class="file-info-content">
+                    <div class="file-info-title" id="file-info-title"></div>
+                    <div class="file-info-desc" id="file-info-desc"></div>
+                    <div class="file-info-tips" id="file-info-tips"></div>
+                </div>
+                <button class="file-info-close" onclick="closeBanner()">✕</button>
             </div>
             <div id="editor-container">
                 <div class="empty-state" id="empty-state">
@@ -767,6 +841,7 @@
             updateEditorUI();
             renderTabs();
             highlightActiveFile();
+            showBanner(tab.file_path);
         }
 
         function closeTab(index) {
@@ -820,6 +895,7 @@
                 updateEditorUI();
                 renderTabs();
                 highlightActiveFile();
+                showBanner(filePath);
                 document.getElementById('status-left').textContent = `${label} — ${formatSize(data.size)}`;
             } catch (e) {
                 toast(`Erreur chargement : ${e.message}`, 'error');
@@ -952,6 +1028,98 @@
             results.classList.add('active');
         }
 
+        // === FILE GUIDES — description + bonnes pratiques par type de fichier ===
+        const FILE_GUIDES = {
+            'SOUL.md': {
+                icon: '🧬',
+                title: 'SOUL.md — Personnalité et règles de l\'agent',
+                desc: 'C\'est le fichier le plus important. Il définit QUI est l\'agent : son nom, sa personnalité, son rôle, ses compétences, ses règles absolues et son style de communication. C\'est le "cerveau" de l\'agent — tout ce qu\'il lit en premier à chaque conversation.',
+                tips: [
+                    { text: '✍️ Écrire en Markdown structuré (## sections)', type: '' },
+                    { text: '🎯 Être précis sur le rôle et les limites', type: '' },
+                    { text: '⚠️ Les règles absolues sont TOUJOURS respectées', type: 'warning' },
+                    { text: '🗣️ Définir le ton (formel, décontracté, technique)', type: '' },
+                    { text: '🚫 Ne pas mettre de données sensibles ici', type: 'danger' },
+                    { text: '📏 Garder < 5000 caractères pour rester efficace', type: 'warning' },
+                ]
+            },
+            'MEMORY.md': {
+                icon: '🧠',
+                title: 'MEMORY.md — Mémoire persistante de l\'agent',
+                desc: 'Ce fichier contient les notes que l\'agent a prises au fil des conversations. Il est injecté dans CHAQUE conversation comme contexte. L\'agent y stocke des faits durables : infos sur l\'environnement, conventions, leçons apprises. C\'est sa "mémoire à long terme".',
+                tips: [
+                    { text: '📐 Format : faits déclaratifs, pas d\'instructions', type: '' },
+                    { text: '🧹 Supprimer les infos obsolètes régulièrement', type: 'warning' },
+                    { text: '⚡ Injecté à CHAQUE tour — garder compact', type: 'warning' },
+                    { text: '❌ Pas de logs, pas de TODO, pas de tâches terminées', type: 'danger' },
+                    { text: '✅ Infos serveur, projets, conventions, préférences', type: '' },
+                    { text: '📊 Limite de taille configurée dans config.yaml', type: '' },
+                ]
+            },
+            'USER.md': {
+                icon: '👤',
+                title: 'USER.md — Profil de l\'utilisateur (toi, JB)',
+                desc: 'Ce fichier décrit QUI tu es pour l\'agent : ton nom, tes préférences, ta timezone, ton style de communication. L\'agent le lit à chaque conversation pour s\'adapter à toi. C\'est comme une fiche contact enrichie.',
+                tips: [
+                    { text: '👋 Nom, surnom, pronoms, timezone', type: '' },
+                    { text: '💬 Style préféré (formel, bref, détaillé)', type: '' },
+                    { text: '🔧 Niveau technique (dev, non-dev, semi-technique)', type: '' },
+                    { text: '🚫 Ce que tu n\'aimes PAS (pet peeves)', type: '' },
+                    { text: '📱 Canaux de communication (Telegram, etc.)', type: '' },
+                    { text: '📏 Garder concis — pas plus de 500 caractères', type: 'warning' },
+                ]
+            },
+            'config.yaml': {
+                icon: '⚙️',
+                title: 'config.yaml — Configuration technique de l\'agent',
+                desc: 'Configuration technique : modèle IA utilisé (Opus, Sonnet, Haiku), provider, timeouts, toolsets activés, personnalités. C\'est le "moteur" de l\'agent. ⚠️ Modifier avec précaution — une erreur YAML peut empêcher l\'agent de démarrer.',
+                tips: [
+                    { text: '🤖 model.default = modèle IA (opus, sonnet, haiku)', type: '' },
+                    { text: '⏱️ gateway_timeout = temps max d\'une conversation', type: '' },
+                    { text: '🔌 toolsets = outils disponibles pour l\'agent', type: '' },
+                    { text: '⚠️ Respecter l\'indentation YAML (2 espaces)', type: 'warning' },
+                    { text: '🚫 NE PAS toucher aux champs inconnus', type: 'danger' },
+                    { text: '🔄 L\'agent doit être redémarré après modification', type: 'warning' },
+                ]
+            },
+            '_dated_memory': {
+                icon: '📅',
+                title: 'Souvenir daté — Archive de conversation',
+                desc: 'Ce fichier est un résumé automatique d\'une conversation passée. L\'agent peut le consulter via session_search pour se rappeler de ce qui a été fait. Ces fichiers sont des archives — les modifier ne change rien au comportement de l\'agent.',
+                tips: [
+                    { text: '📖 Archive en lecture seule recommandée', type: '' },
+                    { text: '🗑️ Peut être supprimé sans impact sur l\'agent', type: '' },
+                    { text: '📅 Format : YYYY-MM-DD.md', type: '' },
+                    { text: '💡 Utile pour retrouver ce qui a été fait tel jour', type: '' },
+                ]
+            }
+        };
+
+        function getFileGuide(filePath) {
+            const name = filePath.split('/').pop();
+            if (FILE_GUIDES[name]) return FILE_GUIDES[name];
+            if (/^20\d{2}-\d{2}-\d{2}\.md$/.test(name)) return FILE_GUIDES['_dated_memory'];
+            return null;
+        }
+
+        function showBanner(filePath) {
+            const guide = getFileGuide(filePath);
+            const banner = document.getElementById('file-info-banner');
+            if (!guide) { banner.classList.remove('show'); return; }
+
+            document.getElementById('file-info-icon').textContent = guide.icon;
+            document.getElementById('file-info-title').textContent = guide.title;
+            document.getElementById('file-info-desc').textContent = guide.desc;
+            document.getElementById('file-info-tips').innerHTML = guide.tips.map(t =>
+                `<span class="file-info-tip ${t.type}">${t.text}</span>`
+            ).join('');
+            banner.classList.add('show');
+        }
+
+        function closeBanner() {
+            document.getElementById('file-info-banner').classList.remove('show');
+        }
+
         // === UI HELPERS ===
         function updateEditorUI() {
             const toolbar = document.getElementById('editor-toolbar');
@@ -986,6 +1154,7 @@
         function showEmptyState() {
             document.getElementById('empty-state').style.display = 'flex';
             document.getElementById('editor-toolbar').style.display = 'none';
+            document.getElementById('file-info-banner').classList.remove('show');
             if (state.editor) state.editor.getModel()?.setValue('');
         }
         function hideEmptyState() {
