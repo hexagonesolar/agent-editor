@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Files Manager — Hexagone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f1117;
+            --bg-secondary: #1a1d27;
+            --bg-tertiary: #242836;
+            --bg-hover: #2a2f3e;
+            --text-primary: #e4e7ec;
+            --text-secondary: #8b92a5;
+            --text-muted: #5c6478;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --border: #2a2f3e;
+            --radius: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* === LOGIN PAGE === */
+        .login-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
+        }
+        .login-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 400px;
+            max-width: 90vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 40px;
+        }
+        .login-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 32px;
+        }
+        .login-field {
+            margin-bottom: 16px;
+        }
+        .login-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .login-field input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .login-field input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+        .login-btn:hover { background: var(--accent-hover); }
+        .login-btn:active { transform: scale(0.98); }
+        .login-btn:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+        .login-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+        }
+        .login-error.show { display: block; }
+
+        /* === APP LAYOUT === */
+        .app {
+            display: none;
+            grid-template-columns: 300px 1fr;
+            grid-template-rows: 56px 1fr 24px;
+            height: 100vh;
+        }
+        .app.active {
+            display: grid;
+        }
+
+        /* === HEADER === */
+        .header {
+            grid-column: 1 / -1;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 10;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .header-user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+        .btn-logout {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-logout:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* === SEARCH === */
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px 8px 34px;
+            color: var(--text-primary);
+            font-size: 13px;
+            width: 260px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .search-box input:focus {
+            border-color: var(--accent);
+        }
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 400px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-top: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .search-result-item:hover { background: var(--bg-hover); }
+        .search-result-agent {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .search-result-file { font-size: 13px; margin: 2px 0; }
+        .search-result-line {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        /* === SIDEBAR === */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 12px 0;
+        }
+        .agent-section { margin-bottom: 8px; }
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            user-select: none;
+        }
+        .agent-header:hover { background: var(--bg-hover); }
+        .agent-emoji { font-size: 20px; }
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 14px; font-weight: 600; }
+        .agent-role { font-size: 11px; color: var(--text-muted); }
+        .agent-toggle {
+            color: var(--text-muted);
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+        .agent-toggle.open { transform: rotate(90deg); }
+
+        .file-list { display: none; padding: 2px 0; }
+        .file-list.open { display: block; }
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px 8px 44px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 13px;
+        }
+        .file-item:hover { background: var(--bg-hover); }
+        .file-item.active {
+            background: var(--bg-tertiary);
+            border-left: 2px solid var(--accent);
+            padding-left: 42px;
+        }
+        .file-icon { font-size: 14px; }
+        .file-info { flex: 1; min-width: 0; }
+        .file-label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .file-desc { font-size: 11px; color: var(--text-muted); }
+        .file-size { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+        /* === EDITOR AREA === */
+        .editor-area {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .tab-bar {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 0 8px;
+            height: 38px;
+            gap: 2px;
+            overflow-x: auto;
+        }
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            white-space: nowrap;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .tab.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .tab-close {
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.15s;
+            line-height: 1;
+        }
+        .tab:hover .tab-close { opacity: 1; }
+        .tab-modified {
+            width: 6px; height: 6px;
+            background: var(--warning);
+            border-radius: 50%;
+            display: none;
+        }
+        .tab-modified.show { display: block; }
+
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        .editor-path {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+        .editor-actions { display: flex; gap: 8px; }
+
+        .btn {
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-primary:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--bg-hover); }
+
+        #editor-container { flex: 1; overflow: hidden; }
+
+        /* File info banner */
+        .file-info-banner {
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: none;
+            gap: 16px;
+            align-items: flex-start;
+            animation: fadeIn 0.2s ease;
+        }
+        .file-info-banner.show { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .file-info-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+        .file-info-content { flex: 1; min-width: 0; }
+        .file-info-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        .file-info-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .file-info-tips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .file-info-tip {
+            font-size: 11px;
+            padding: 3px 10px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            color: var(--accent-hover);
+            white-space: nowrap;
+        }
+        .file-info-tip.warning {
+            background: rgba(234, 179, 8, 0.1);
+            border-color: rgba(234, 179, 8, 0.2);
+            color: #fbbf24;
+        }
+        .file-info-tip.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+        .file-info-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .file-info-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            gap: 12px;
+        }
+        .empty-state-icon { font-size: 48px; }
+        .empty-state-text { font-size: 16px; }
+        .empty-state-hint { font-size: 13px; }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast-success { background: #065f46; color: #6ee7b7; }
+        .toast-error { background: #7f1d1d; color: #fca5a5; }
+        .toast-info { background: #1e3a5f; color: #93c5fd; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .status-bar {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 4px 16px;
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            grid-column: 1 / -1;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <!-- ========== LOGIN ========== -->
+    <div class="login-page" id="login-page">
+        <div class="login-card">
+            <div class="login-logo">⚡</div>
+            <div class="login-title">Agent Files Manager</div>
+            <div class="login-subtitle">Connexion à l'éditeur agents Hermes</div>
+            <div class="login-error" id="login-error"></div>
+            <form onsubmit="handleLogin(event)">
+                <div class="login-field">
+                    <label for="login-user">Utilisateur</label>
+                    <input type="text" id="login-user" autocomplete="username" autofocus value="jb" />
+                </div>
+                <div class="login-field">
+                    <label for="login-pass">Mot de passe</label>
+                    <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••" />
+                </div>
+                <button type="submit" class="login-btn" id="login-btn">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========== APP ========== -->
+    <div class="app" id="app">
+        <header class="header">
+            <div class="header-left">
+                <span class="header-logo">⚡ Agent Files Manager</span>
+                <span class="header-subtitle">Éditeur de configuration agents Hermes</span>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Rechercher dans les fichiers..." />
+                    <div class="search-results" id="search-results"></div>
+                </div>
+                <div class="header-user">
+                    <div class="header-user-avatar" id="user-avatar">JB</div>
+                    <span id="user-name">jb</span>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()">Déconnexion</button>
+            </div>
+        </header>
+
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="editor-area">
+            <div class="tab-bar" id="tab-bar"></div>
+            <div class="editor-toolbar" id="editor-toolbar" style="display:none;">
+                <span class="editor-path" id="editor-path"></span>
+                <div class="editor-actions">
+                    <button class="btn btn-secondary" id="btn-revert" onclick="revertFile()">↩ Annuler</button>
+                    <button class="btn btn-primary" id="btn-save" onclick="saveFile()" disabled>💾 Sauvegarder</button>
+                </div>
+            </div>
+            <div class="file-info-banner" id="file-info-banner">
+                <span class="file-info-icon" id="file-info-icon"></span>
+                <div class="file-info-content">
+                    <div class="file-info-title" id="file-info-title"></div>
+                    <div class="file-info-desc" id="file-info-desc"></div>
+                    <div class="file-info-tips" id="file-info-tips"></div>
+                </div>
+                <button class="file-info-close" onclick="closeBanner()">✕</button>
+            </div>
+            <div id="editor-container">
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-text">Sélectionne un fichier à éditer</div>
+                    <div class="empty-state-hint">Clique sur un agent dans la barre latérale pour voir ses fichiers</div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="status-bar">
+            <span id="status-left">Prêt</span>
+            <span id="status-right">Agent Files Manager v1.1</span>
+        </footer>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Monaco Editor CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+
+    <script>
+        // === STATE ===
+        const state = {
+            agents: [],
+            openTabs: [],
+            activeTab: null,
+            editor: null,
+            editorReady: false,
+            currentUser: null,
+        };
+
+        // Détecter automatiquement le base path
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const basePath = pathParts.length > 0 ? '/' + pathParts[0] : '';
+        const API_BASE = basePath + '/api';
+
+        // === AUTH ===
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API_BASE}/me`, { credentials: 'same-origin' });
+                if (res.ok) {
+                    const user = await res.json();
+                    state.currentUser = user;
+                    showApp(user);
+                    return true;
+                }
+            } catch (e) {}
+            showLogin();
+            return false;
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const errorEl = document.getElementById('login-error');
+            const username = document.getElementById('login-user').value.trim();
+            const password = document.getElementById('login-pass').value;
+
+            if (!username || !password) {
+                errorEl.textContent = 'Remplis les deux champs';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Connexion...';
+            errorEl.classList.remove('show');
+
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'same-origin',
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    state.currentUser = { username: data.username };
+                    showApp({ username: data.username });
+                } else {
+                    errorEl.textContent = 'Identifiants incorrects';
+                    errorEl.classList.add('show');
+                    document.getElementById('login-pass').value = '';
+                    document.getElementById('login-pass').focus();
+                }
+            } catch (e) {
+                errorEl.textContent = 'Erreur de connexion au serveur';
+                errorEl.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Se connecter';
+            }
+        }
+
+        async function handleLogout() {
+            await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'same-origin' });
+            state.currentUser = null;
+            state.agents = [];
+            state.openTabs = [];
+            state.activeTab = null;
+            showLogin();
+        }
+
+        function showLogin() {
+            document.getElementById('login-page').style.display = 'flex';
+            document.getElementById('app').classList.remove('active');
+            document.getElementById('login-user').focus();
+        }
+
+        function showApp(user) {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('app').classList.add('active');
+            document.getElementById('user-name').textContent = user.username;
+            document.getElementById('user-avatar').textContent = user.username.substring(0, 2).toUpperCase();
+            init();
+        }
+
+        // === INIT ===
+        async function init() {
+            await loadAgents();
+            renderSidebar();
+            if (!state.editorReady) initEditor();
+            initSearch();
+        }
+
+        // === API (toutes les requêtes avec credentials) ===
+        async function apiFetch(url, options = {}) {
+            options.credentials = 'same-origin';
+            const res = await fetch(url, options);
+            if (res.status === 401) {
+                showLogin();
+                throw new Error('Session expirée');
+            }
+            return res;
+        }
+
+        async function loadAgents() {
+            try {
+                const res = await apiFetch(`${API_BASE}/agents`);
+                state.agents = await res.json();
+            } catch (e) {
+                if (e.message !== 'Session expirée') toast('Erreur de connexion à l\'API', 'error');
+            }
+        }
+
+        async function fetchFile(agentId, filePath) {
+            const res = await apiFetch(`${API_BASE}/agents/${agentId}/files/${filePath}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        }
+
+        async function saveFileToServer(agentId, filePath, content) {
+            const res = await apiFetch(`${API_BASE}/agents/${agentId}/files/${filePath}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        }
+
+        // === SIDEBAR ===
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.innerHTML = state.agents.map(agent => `
+                <div class="agent-section">
+                    <div class="agent-header" onclick="toggleAgent('${agent.id}')">
+                        <span class="agent-emoji">${agent.emoji}</span>
+                        <div class="agent-info">
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-role">${agent.role}</div>
+                        </div>
+                        <span class="agent-toggle" id="toggle-${agent.id}">▶</span>
+                    </div>
+                    <div class="file-list" id="files-${agent.id}">
+                        ${agent.files.filter(f => f.exists).map(f => `
+                            <div class="file-item" id="file-${agent.id}-${f.path.replace(/[\/\.]/g, '-')}"
+                                 onclick="openFile('${agent.id}', '${f.path}', '${f.label}')">
+                                <span class="file-icon">${f.icon}</span>
+                                <div class="file-info">
+                                    <div class="file-label">${f.label}</div>
+                                    <div class="file-desc">${f.description}</div>
+                                </div>
+                                <span class="file-size">${formatSize(f.size)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            if (state.agents.length > 0) toggleAgent(state.agents[0].id);
+        }
+
+        function toggleAgent(agentId) {
+            const list = document.getElementById(`files-${agentId}`);
+            const toggle = document.getElementById(`toggle-${agentId}`);
+            list.classList.toggle('open');
+            toggle.classList.toggle('open');
+        }
+
+        // === TABS ===
+        function renderTabs() {
+            const bar = document.getElementById('tab-bar');
+            bar.innerHTML = state.openTabs.map((tab, i) => {
+                const isModified = tab.modified !== tab.original;
+                return `
+                    <div class="tab ${i === state.activeTab ? 'active' : ''}" onclick="switchTab(${i})">
+                        <span class="tab-modified ${isModified ? 'show' : ''}"></span>
+                        <span>${tab.label}</span>
+                        <span class="tab-close" onclick="event.stopPropagation(); closeTab(${i})">×</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchTab(index) {
+            if (state.activeTab !== null && state.editor) {
+                state.openTabs[state.activeTab].modified = state.editor.getValue();
+            }
+            state.activeTab = index;
+            const tab = state.openTabs[index];
+            if (state.editor) {
+                const lang = tab.file_path.endsWith('.yaml') ? 'yaml' : 'markdown';
+                monaco.editor.setModelLanguage(state.editor.getModel(), lang);
+                state.editor.setValue(tab.modified);
+            }
+            updateEditorUI();
+            renderTabs();
+            highlightActiveFile();
+            showBanner(tab.file_path);
+        }
+
+        function closeTab(index) {
+            const tab = state.openTabs[index];
+            if (tab.modified !== tab.original) {
+                if (!confirm(`"${tab.label}" a été modifié. Fermer sans sauvegarder ?`)) return;
+            }
+            state.openTabs.splice(index, 1);
+            if (state.openTabs.length === 0) {
+                state.activeTab = null;
+                showEmptyState();
+            } else {
+                state.activeTab = Math.min(index, state.openTabs.length - 1);
+                switchTab(state.activeTab);
+            }
+            renderTabs();
+        }
+
+        // === OPEN FILE ===
+        async function openFile(agentId, filePath, label) {
+            const existing = state.openTabs.findIndex(
+                t => t.agent_id === agentId && t.file_path === filePath
+            );
+            if (existing !== -1) { switchTab(existing); return; }
+
+            try {
+                document.getElementById('status-left').textContent = `Chargement de ${label}...`;
+                const data = await fetchFile(agentId, filePath);
+
+                if (state.activeTab !== null && state.editor) {
+                    state.openTabs[state.activeTab].modified = state.editor.getValue();
+                }
+
+                state.openTabs.push({
+                    agent_id: agentId,
+                    file_path: filePath,
+                    label: label,
+                    original: data.content,
+                    modified: data.content,
+                });
+
+                state.activeTab = state.openTabs.length - 1;
+                hideEmptyState();
+
+                if (state.editor) {
+                    const lang = filePath.endsWith('.yaml') ? 'yaml' : 'markdown';
+                    monaco.editor.setModelLanguage(state.editor.getModel(), lang);
+                    state.editor.setValue(data.content);
+                }
+
+                updateEditorUI();
+                renderTabs();
+                highlightActiveFile();
+                showBanner(filePath);
+                document.getElementById('status-left').textContent = `${label} — ${formatSize(data.size)}`;
+            } catch (e) {
+                toast(`Erreur chargement : ${e.message}`, 'error');
+                document.getElementById('status-left').textContent = 'Erreur';
+            }
+        }
+
+        // === SAVE / REVERT ===
+        async function saveFile() {
+            if (state.activeTab === null) return;
+            const tab = state.openTabs[state.activeTab];
+            const content = state.editor.getValue();
+            try {
+                document.getElementById('btn-save').disabled = true;
+                document.getElementById('btn-save').innerHTML = '⏳ Sauvegarde...';
+                const result = await saveFileToServer(tab.agent_id, tab.file_path, content);
+                tab.original = content;
+                tab.modified = content;
+                toast(`${tab.label} sauvegardé ✅`, 'success');
+                renderTabs();
+                updateSaveButton();
+            } catch (e) {
+                toast(`Erreur sauvegarde : ${e.message}`, 'error');
+            } finally {
+                document.getElementById('btn-save').innerHTML = '💾 Sauvegarder';
+            }
+        }
+
+        function revertFile() {
+            if (state.activeTab === null) return;
+            const tab = state.openTabs[state.activeTab];
+            if (confirm('Annuler toutes les modifications ?')) {
+                state.editor.setValue(tab.original);
+                tab.modified = tab.original;
+                renderTabs();
+                updateSaveButton();
+                toast('Modifications annulées', 'info');
+            }
+        }
+
+        // === EDITOR INIT ===
+        function initEditor() {
+            require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+            require(['vs/editor/editor.main'], function () {
+                monaco.editor.defineTheme('agent-dark', {
+                    base: 'vs-dark',
+                    inherit: true,
+                    rules: [],
+                    colors: {
+                        'editor.background': '#0f1117',
+                        'editor.lineHighlightBackground': '#1a1d27',
+                        'editorGutter.background': '#0f1117',
+                    }
+                });
+
+                state.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                    value: '',
+                    language: 'markdown',
+                    theme: 'agent-dark',
+                    fontSize: 14,
+                    fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+                    lineNumbers: 'on',
+                    minimap: { enabled: true },
+                    wordWrap: 'on',
+                    automaticLayout: true,
+                    renderWhitespace: 'boundary',
+                    scrollBeyondLastLine: false,
+                    padding: { top: 12 },
+                    bracketPairColorization: { enabled: true },
+                });
+
+                state.editor.onDidChangeModelContent(() => {
+                    if (state.activeTab !== null) {
+                        state.openTabs[state.activeTab].modified = state.editor.getValue();
+                        updateSaveButton();
+                        renderTabs();
+                    }
+                });
+
+                state.editor.addAction({
+                    id: 'save-file',
+                    label: 'Sauvegarder',
+                    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+                    run: () => saveFile(),
+                });
+
+                state.editorReady = true;
+            });
+        }
+
+        // === SEARCH ===
+        function initSearch() {
+            const input = document.getElementById('search-input');
+            const results = document.getElementById('search-results');
+            let debounce;
+
+            input.addEventListener('input', () => {
+                clearTimeout(debounce);
+                debounce = setTimeout(async () => {
+                    const q = input.value.trim();
+                    if (q.length < 2) { results.classList.remove('active'); return; }
+                    try {
+                        const res = await apiFetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`);
+                        const data = await res.json();
+                        renderSearchResults(data);
+                    } catch (e) { console.error(e); }
+                }, 300);
+            });
+            input.addEventListener('blur', () => {
+                setTimeout(() => results.classList.remove('active'), 200);
+            });
+        }
+
+        function renderSearchResults(data) {
+            const results = document.getElementById('search-results');
+            if (data.length === 0) {
+                results.innerHTML = '<div style="padding:14px;color:var(--text-muted)">Aucun résultat</div>';
+            } else {
+                results.innerHTML = data.map(r => `
+                    ${r.matches.slice(0, 3).map(m => `
+                        <div class="search-result-item"
+                             onclick="openFile('${r.agent_id}', '${r.file_path}', '${r.file_label}')">
+                            <div class="search-result-agent">${r.agent_name}</div>
+                            <div class="search-result-file">${r.file_label}</div>
+                            <div class="search-result-line">L${m.line}: ${escapeHtml(m.text)}</div>
+                        </div>
+                    `).join('')}
+                `).join('');
+            }
+            results.classList.add('active');
+        }
+
+        // === FILE GUIDES — description + bonnes pratiques par type de fichier ===
+        const FILE_GUIDES = {
+            'SOUL.md': {
+                icon: '🧬',
+                title: 'SOUL.md — Personnalité et règles de l\'agent',
+                desc: 'C\'est le fichier le plus important. Il définit QUI est l\'agent : son nom, sa personnalité, son rôle, ses compétences, ses règles absolues et son style de communication. C\'est le "cerveau" de l\'agent — tout ce qu\'il lit en premier à chaque conversation.',
+                tips: [
+                    { text: '✍️ Écrire en Markdown structuré (## sections)', type: '' },
+                    { text: '🎯 Être précis sur le rôle et les limites', type: '' },
+                    { text: '⚠️ Les règles absolues sont TOUJOURS respectées', type: 'warning' },
+                    { text: '🗣️ Définir le ton (formel, décontracté, technique)', type: '' },
+                    { text: '🚫 Ne pas mettre de données sensibles ici', type: 'danger' },
+                    { text: '📏 Garder < 5000 caractères pour rester efficace', type: 'warning' },
+                ]
+            },
+            'MEMORY.md': {
+                icon: '🧠',
+                title: 'MEMORY.md — Mémoire persistante de l\'agent',
+                desc: 'Ce fichier contient les notes que l\'agent a prises au fil des conversations. Il est injecté dans CHAQUE conversation comme contexte. L\'agent y stocke des faits durables : infos sur l\'environnement, conventions, leçons apprises. C\'est sa "mémoire à long terme".',
+                tips: [
+                    { text: '📐 Format : faits déclaratifs, pas d\'instructions', type: '' },
+                    { text: '🧹 Supprimer les infos obsolètes régulièrement', type: 'warning' },
+                    { text: '⚡ Injecté à CHAQUE tour — garder compact', type: 'warning' },
+                    { text: '❌ Pas de logs, pas de TODO, pas de tâches terminées', type: 'danger' },
+                    { text: '✅ Infos serveur, projets, conventions, préférences', type: '' },
+                    { text: '📊 Limite de taille configurée dans config.yaml', type: '' },
+                ]
+            },
+            'USER.md': {
+                icon: '👤',
+                title: 'USER.md — Profil de l\'utilisateur (toi, JB)',
+                desc: 'Ce fichier décrit QUI tu es pour l\'agent : ton nom, tes préférences, ta timezone, ton style de communication. L\'agent le lit à chaque conversation pour s\'adapter à toi. C\'est comme une fiche contact enrichie.',
+                tips: [
+                    { text: '👋 Nom, surnom, pronoms, timezone', type: '' },
+                    { text: '💬 Style préféré (formel, bref, détaillé)', type: '' },
+                    { text: '🔧 Niveau technique (dev, non-dev, semi-technique)', type: '' },
+                    { text: '🚫 Ce que tu n\'aimes PAS (pet peeves)', type: '' },
+                    { text: '📱 Canaux de communication (Telegram, etc.)', type: '' },
+                    { text: '📏 Garder concis — pas plus de 500 caractères', type: 'warning' },
+                ]
+            },
+            'config.yaml': {
+                icon: '⚙️',
+                title: 'config.yaml — Configuration technique de l\'agent',
+                desc: 'Configuration technique : modèle IA utilisé (Opus, Sonnet, Haiku), provider, timeouts, toolsets activés, personnalités. C\'est le "moteur" de l\'agent. ⚠️ Modifier avec précaution — une erreur YAML peut empêcher l\'agent de démarrer.',
+                tips: [
+                    { text: '🤖 model.default = modèle IA (opus, sonnet, haiku)', type: '' },
+                    { text: '⏱️ gateway_timeout = temps max d\'une conversation', type: '' },
+                    { text: '🔌 toolsets = outils disponibles pour l\'agent', type: '' },
+                    { text: '⚠️ Respecter l\'indentation YAML (2 espaces)', type: 'warning' },
+                    { text: '🚫 NE PAS toucher aux champs inconnus', type: 'danger' },
+                    { text: '🔄 L\'agent doit être redémarré après modification', type: 'warning' },
+                ]
+            },
+            '_dated_memory': {
+                icon: '📅',
+                title: 'Souvenir daté — Archive de conversation',
+                desc: 'Ce fichier est un résumé automatique d\'une conversation passée. L\'agent peut le consulter via session_search pour se rappeler de ce qui a été fait. Ces fichiers sont des archives — les modifier ne change rien au comportement de l\'agent.',
+                tips: [
+                    { text: '📖 Archive en lecture seule recommandée', type: '' },
+                    { text: '🗑️ Peut être supprimé sans impact sur l\'agent', type: '' },
+                    { text: '📅 Format : YYYY-MM-DD.md', type: '' },
+                    { text: '💡 Utile pour retrouver ce qui a été fait tel jour', type: '' },
+                ]
+            }
+        };
+
+        function getFileGuide(filePath) {
+            const name = filePath.split('/').pop();
+            if (FILE_GUIDES[name]) return FILE_GUIDES[name];
+            if (/^20\d{2}-\d{2}-\d{2}\.md$/.test(name)) return FILE_GUIDES['_dated_memory'];
+            return null;
+        }
+
+        function showBanner(filePath) {
+            const guide = getFileGuide(filePath);
+            const banner = document.getElementById('file-info-banner');
+            if (!guide) { banner.classList.remove('show'); return; }
+
+            document.getElementById('file-info-icon').textContent = guide.icon;
+            document.getElementById('file-info-title').textContent = guide.title;
+            document.getElementById('file-info-desc').textContent = guide.desc;
+            document.getElementById('file-info-tips').innerHTML = guide.tips.map(t =>
+                `<span class="file-info-tip ${t.type}">${t.text}</span>`
+            ).join('');
+            banner.classList.add('show');
+        }
+
+        function closeBanner() {
+            document.getElementById('file-info-banner').classList.remove('show');
+        }
+
+        // === UI HELPERS ===
+        function updateEditorUI() {
+            const toolbar = document.getElementById('editor-toolbar');
+            const path = document.getElementById('editor-path');
+            if (state.activeTab !== null) {
+                const tab = state.openTabs[state.activeTab];
+                toolbar.style.display = 'flex';
+                const agent = state.agents.find(a => a.id === tab.agent_id);
+                path.textContent = `${agent?.emoji || ''} ${agent?.name || tab.agent_id} → ${tab.file_path}`;
+                updateSaveButton();
+            } else {
+                toolbar.style.display = 'none';
+            }
+        }
+
+        function updateSaveButton() {
+            const btn = document.getElementById('btn-save');
+            if (state.activeTab === null) return;
+            const tab = state.openTabs[state.activeTab];
+            btn.disabled = tab.modified === tab.original;
+        }
+
+        function highlightActiveFile() {
+            document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+            if (state.activeTab !== null) {
+                const tab = state.openTabs[state.activeTab];
+                const id = `file-${tab.agent_id}-${tab.file_path.replace(/[\/\.]/g, '-')}`;
+                document.getElementById(id)?.classList.add('active');
+            }
+        }
+
+        function showEmptyState() {
+            document.getElementById('empty-state').style.display = 'flex';
+            document.getElementById('editor-toolbar').style.display = 'none';
+            document.getElementById('file-info-banner').classList.remove('show');
+            if (state.editor) state.editor.getModel()?.setValue('');
+        }
+        function hideEmptyState() {
+            document.getElementById('empty-state').style.display = 'none';
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return `${bytes} B`;
+            return `${(bytes / 1024).toFixed(1)} KB`;
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.textContent = text;
+            return d.innerHTML;
+        }
+
+        function toast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = `toast toast-${type}`;
+            el.textContent = message;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 4000);
+        }
+
+        // === BOOT ===
+        checkAuth();
+    </script>
+</body>
+</html>

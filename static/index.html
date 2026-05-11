@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
     <title>Agent Files Manager — Hexagone</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -23,1166 +23,514 @@
             --border: #2a2f3e;
             --radius: 10px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
+            overscroll-behavior: none;
+            -webkit-text-size-adjust: 100%;
         }
 
-        /* === LOGIN PAGE === */
+        /* ===== LOGIN ===== */
         .login-page {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            height: 100vh; height: 100dvh;
             background: var(--bg-primary);
-            background-image: 
-                radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 50%, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
+            background-image: radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 50%, rgba(168,85,247,0.06) 0%, transparent 50%);
         }
-        .login-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 48px 40px;
-            width: 400px;
-            max-width: 90vw;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-        }
-        .login-logo {
-            text-align: center;
-            margin-bottom: 8px;
-            font-size: 40px;
-        }
-        .login-title {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .login-subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 32px;
-        }
-        .login-field {
-            margin-bottom: 16px;
-        }
-        .login-field label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-        .login-field input {
-            width: 100%;
-            padding: 12px 14px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .login-field input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            margin-top: 8px;
-        }
+        .login-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; padding: 48px 40px; width: 400px; max-width: 92vw; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .login-logo { text-align: center; margin-bottom: 8px; font-size: 40px; }
+        .login-title { text-align: center; font-size: 22px; font-weight: 700; margin-bottom: 4px; background: linear-gradient(135deg, var(--accent), #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .login-subtitle { text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 32px; }
+        .login-field { margin-bottom: 16px; }
+        .login-field label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+        .login-field input { width: 100%; padding: 12px 14px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 16px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        .login-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .login-btn { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; margin-top: 8px; touch-action: manipulation; }
         .login-btn:hover { background: var(--accent-hover); }
-        .login-btn:active { transform: scale(0.98); }
-        .login-btn:disabled {
-            background: var(--bg-tertiary);
-            color: var(--text-muted);
-            cursor: not-allowed;
-            transform: none;
-        }
-        .login-error {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 16px;
-            display: none;
-            text-align: center;
-        }
+        .login-btn:disabled { background: var(--bg-tertiary); color: var(--text-muted); cursor: not-allowed; }
+        .login-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; text-align: center; }
         .login-error.show { display: block; }
 
-        /* === APP LAYOUT === */
-        .app {
-            display: none;
-            grid-template-columns: 300px 1fr;
-            grid-template-rows: 56px 1fr 24px;
-            height: 100vh;
-        }
-        .app.active {
-            display: grid;
-        }
+        /* ===== APP LAYOUT ===== */
+        .app { display: none; grid-template-columns: 280px 1fr; grid-template-rows: 52px 1fr 24px; height: 100vh; height: 100dvh; }
+        .app.active { display: grid; }
 
-        /* === HEADER === */
-        .header {
-            grid-column: 1 / -1;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 10;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .header-logo {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .header-subtitle {
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .header-user {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-        .header-user-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: white;
-        }
-        .btn-logout {
-            padding: 6px 12px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-muted);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
-        }
-        .btn-logout:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
+        /* ===== HEADER ===== */
+        .header { grid-column: 1/-1; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 10; }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .hamburger { display: none; background: none; border: none; color: var(--text-primary); font-size: 22px; cursor: pointer; padding: 6px; touch-action: manipulation; }
+        .header-logo { font-size: 17px; font-weight: 700; background: linear-gradient(135deg, var(--accent), #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
+        .header-subtitle { color: var(--text-muted); font-size: 12px; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .header-user { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 12px; }
+        .header-user-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; }
+        .btn-logout { padding: 5px 10px; background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--text-muted); font-size: 11px; cursor: pointer; font-family: inherit; touch-action: manipulation; }
+        .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
 
-        /* === SEARCH === */
-        .search-box {
-            position: relative;
-        }
-        .search-box input {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 12px 8px 34px;
-            color: var(--text-primary);
-            font-size: 13px;
-            width: 260px;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: inherit;
-        }
-        .search-box input:focus {
-            border-color: var(--accent);
-        }
-        .search-box::before {
-            content: "🔍";
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 13px;
-        }
-        .search-results {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            width: 400px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-top: 4px;
-            max-height: 400px;
-            overflow-y: auto;
-            z-index: 100;
-            display: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-        }
+        /* ===== SEARCH ===== */
+        .search-box { position: relative; }
+        .search-box input { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px 7px 30px; color: var(--text-primary); font-size: 13px; width: 200px; outline: none; font-family: inherit; }
+        .search-box input:focus { border-color: var(--accent); }
+        .search-box::before { content: "🔍"; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 12px; }
+        .search-results { position: absolute; top: 100%; right: 0; width: 350px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); margin-top: 4px; max-height: 350px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
         .search-results.active { display: block; }
-        .search-result-item {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: background 0.15s;
-        }
+        .search-result-item { padding: 10px 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
         .search-result-item:hover { background: var(--bg-hover); }
-        .search-result-agent {
-            font-size: 11px;
-            color: var(--accent);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .search-result-agent { font-size: 11px; color: var(--accent); font-weight: 600; text-transform: uppercase; }
         .search-result-file { font-size: 13px; margin: 2px 0; }
-        .search-result-line {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-family: monospace;
-        }
+        .search-result-line { font-size: 12px; color: var(--text-muted); font-family: monospace; }
 
-        /* === SIDEBAR === */
-        .sidebar {
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-            padding: 12px 0;
-        }
-        .agent-section { margin-bottom: 8px; }
-        .agent-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            cursor: pointer;
-            transition: background 0.15s;
-            user-select: none;
-        }
+        /* ===== SIDEBAR ===== */
+        .sidebar { background: var(--bg-secondary); border-right: 1px solid var(--border); overflow-y: auto; padding: 12px 0; -webkit-overflow-scrolling: touch; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 49; }
+        .sidebar-overlay.visible { display: block; }
+        .agent-section { margin-bottom: 6px; }
+        .agent-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; cursor: pointer; user-select: none; touch-action: manipulation; }
         .agent-header:hover { background: var(--bg-hover); }
         .agent-emoji { font-size: 20px; }
         .agent-info { flex: 1; }
         .agent-name { font-size: 14px; font-weight: 600; }
         .agent-role { font-size: 11px; color: var(--text-muted); }
-        .agent-toggle {
-            color: var(--text-muted);
-            font-size: 12px;
-            transition: transform 0.2s;
-        }
+        .agent-toggle { color: var(--text-muted); font-size: 12px; transition: transform 0.2s; }
         .agent-toggle.open { transform: rotate(90deg); }
-
         .file-list { display: none; padding: 2px 0; }
         .file-list.open { display: block; }
-        .file-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px 8px 44px;
-            cursor: pointer;
-            transition: background 0.15s;
-            font-size: 13px;
-        }
+        .file-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px 8px 40px; cursor: pointer; font-size: 13px; touch-action: manipulation; }
         .file-item:hover { background: var(--bg-hover); }
-        .file-item.active {
-            background: var(--bg-tertiary);
-            border-left: 2px solid var(--accent);
-            padding-left: 42px;
-        }
+        .file-item.active { background: var(--bg-tertiary); border-left: 2px solid var(--accent); padding-left: 38px; }
         .file-icon { font-size: 14px; }
         .file-info { flex: 1; min-width: 0; }
-        .file-label {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .file-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .file-desc { font-size: 11px; color: var(--text-muted); }
-        .file-size { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+        .file-meta { font-size: 10px; color: var(--text-muted); white-space: nowrap; display: flex; gap: 6px; align-items: center; }
+        .file-versions-badge { background: var(--accent-glow); color: var(--accent-hover); padding: 1px 6px; border-radius: 10px; font-size: 10px; }
 
-        /* === EDITOR AREA === */
-        .editor-area {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .tab-bar {
-            display: flex;
-            align-items: center;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 0 8px;
-            height: 38px;
-            gap: 2px;
-            overflow-x: auto;
-        }
-        .tab {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 12px;
-            cursor: pointer;
-            border-radius: 6px 6px 0 0;
-            white-space: nowrap;
-            transition: all 0.15s;
-            font-family: inherit;
-        }
+        /* ===== EDITOR AREA ===== */
+        .editor-area { display: flex; flex-direction: column; overflow: hidden; }
+        .tab-bar { display: flex; align-items: center; background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 0 6px; height: 36px; gap: 2px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .tab-bar::-webkit-scrollbar { display: none; }
+        .tab { display: flex; align-items: center; gap: 4px; padding: 5px 12px; background: transparent; border: none; color: var(--text-secondary); font-size: 12px; cursor: pointer; border-radius: 6px 6px 0 0; white-space: nowrap; font-family: inherit; flex-shrink: 0; max-width: 160px; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-        .tab.active {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-        .tab-close {
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.15s;
-            line-height: 1;
-        }
-        .tab:hover .tab-close { opacity: 1; }
-        .tab-modified {
-            width: 6px; height: 6px;
-            background: var(--warning);
-            border-radius: 50%;
-            display: none;
-        }
+        .tab.active { background: var(--bg-primary); color: var(--text-primary); font-weight: 500; }
+        .tab-close { font-size: 14px; opacity: 0; line-height: 1; min-width: 20px; min-height: 20px; display: flex; align-items: center; justify-content: center; }
+        .tab:hover .tab-close, .tab.active .tab-close { opacity: 1; }
+        .tab-modified { width: 6px; height: 6px; background: var(--warning); border-radius: 50%; display: none; }
         .tab-modified.show { display: block; }
 
-        .editor-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 16px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-        }
-        .editor-path {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-family: monospace;
-        }
-        .editor-actions { display: flex; gap: 8px; }
-
-        .btn {
-            padding: 6px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: all 0.15s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: inherit;
-        }
+        .editor-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); gap: 8px; flex-wrap: wrap; }
+        .editor-path { font-size: 11px; color: var(--text-muted); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
+        .editor-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; display: flex; align-items: center; gap: 5px; font-family: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; min-height: 36px; white-space: nowrap; }
+        .btn:active { transform: scale(0.97); }
         .btn-primary { background: var(--accent); color: white; }
         .btn-primary:hover { background: var(--accent-hover); }
-        .btn-primary:disabled {
-            background: var(--bg-tertiary);
-            color: var(--text-muted);
-            cursor: not-allowed;
-        }
+        .btn-primary:disabled { background: var(--bg-tertiary); color: var(--text-muted); cursor: not-allowed; transform: none; }
         .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
         .btn-secondary:hover { background: var(--bg-hover); }
+        .btn-success { background: #065f46; color: #6ee7b7; }
+        .btn-success:hover { background: #047857; }
+        .btn-warning { background: #78350f; color: #fbbf24; }
+        .btn-warning:hover { background: #92400e; }
 
         #editor-container { flex: 1; overflow: hidden; }
 
-        /* File info banner */
-        .file-info-banner {
-            background: var(--bg-tertiary);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 20px;
-            display: none;
-            gap: 16px;
-            align-items: flex-start;
-            animation: fadeIn 0.2s ease;
-        }
+        /* ===== FILE INFO BANNER ===== */
+        .file-info-banner { background: var(--bg-tertiary); border-bottom: 1px solid var(--border); padding: 10px 14px; display: none; gap: 12px; align-items: flex-start; }
         .file-info-banner.show { display: flex; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .file-info-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+        .file-info-icon { font-size: 24px; flex-shrink: 0; }
         .file-info-content { flex: 1; min-width: 0; }
-        .file-info-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--text-primary);
-        }
-        .file-info-desc {
-            font-size: 12px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            margin-bottom: 8px;
-        }
-        .file-info-tips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .file-info-tip {
-            font-size: 11px;
-            padding: 3px 10px;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 20px;
-            color: var(--accent-hover);
-            white-space: nowrap;
-        }
-        .file-info-tip.warning {
-            background: rgba(234, 179, 8, 0.1);
-            border-color: rgba(234, 179, 8, 0.2);
-            color: #fbbf24;
-        }
-        .file-info-tip.danger {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-        }
-        .file-info-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 16px;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-        .file-info-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .file-info-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+        .file-info-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 6px; }
+        .file-info-tips { display: flex; flex-wrap: wrap; gap: 4px; }
+        .file-info-tip { font-size: 10px; padding: 2px 8px; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 20px; color: var(--accent-hover); }
+        .file-info-tip.warning { background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.2); color: #fbbf24; }
+        .file-info-tip.danger { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2); color: #fca5a5; }
+        .file-info-close { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
 
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-muted);
-            gap: 12px;
-        }
+        /* ===== EMPTY STATE ===== */
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); gap: 12px; padding: 20px; text-align: center; }
         .empty-state-icon { font-size: 48px; }
         .empty-state-text { font-size: 16px; }
         .empty-state-hint { font-size: 13px; }
 
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .toast {
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        /* ===== HISTORY PANEL ===== */
+        .history-panel { display: none; position: fixed; right: 0; top: 0; width: 350px; max-width: 90vw; height: 100vh; height: 100dvh; background: var(--bg-secondary); border-left: 1px solid var(--border); z-index: 60; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,0.3); }
+        .history-panel.open { display: flex; }
+        .history-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .history-title { font-size: 15px; font-weight: 600; }
+        .history-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 4px 8px; }
+        .history-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+        .history-item { padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+        .history-item:hover { background: var(--bg-hover); }
+        .history-item.active { background: var(--bg-tertiary); border-left: 3px solid var(--accent); }
+        .history-date { font-size: 13px; font-weight: 500; }
+        .history-time { font-size: 11px; color: var(--text-muted); }
+        .history-size { font-size: 11px; color: var(--text-muted); }
+        .history-actions { padding: 12px 16px; border-top: 1px solid var(--border); }
+        .history-diff { padding: 12px; max-height: 300px; overflow: auto; font-family: monospace; font-size: 11px; line-height: 1.6; background: var(--bg-primary); border-radius: 8px; margin: 8px 16px; }
+        .diff-add { color: #4ade80; background: rgba(74,222,128,0.1); }
+        .diff-del { color: #f87171; background: rgba(248,113,113,0.1); }
+        .diff-info { color: var(--accent); }
+
+        /* ===== ANALYZE MODAL ===== */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 70; align-items: center; justify-content: center; padding: 16px; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; width: 600px; max-width: 100%; max-height: 90vh; max-height: 90dvh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 700; }
+        .modal-close { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; }
+        .modal-body { padding: 20px 24px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+        /* Score */
+        .score-ring { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto 16px; }
+        .score-good { background: rgba(34,197,94,0.15); color: #4ade80; border: 3px solid #22c55e; }
+        .score-ok { background: rgba(234,179,8,0.15); color: #fbbf24; border: 3px solid #eab308; }
+        .score-bad { background: rgba(239,68,68,0.15); color: #f87171; border: 3px solid #ef4444; }
+        .score-label { text-align: center; font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+
+        /* Issues */
+        .issue-item { display: flex; gap: 12px; padding: 12px; background: var(--bg-tertiary); border-radius: 8px; margin-bottom: 8px; }
+        .issue-icon { font-size: 20px; flex-shrink: 0; }
+        .issue-content { flex: 1; }
+        .issue-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+        .issue-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+        .issue-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; display: inline-block; margin-top: 4px; }
+        .issue-badge.danger { background: rgba(239,68,68,0.15); color: #f87171; }
+        .issue-badge.warning { background: rgba(234,179,8,0.15); color: #fbbf24; }
+        .issue-badge.info { background: rgba(99,102,241,0.15); color: var(--accent-hover); }
+        .stats-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+        .stat-chip { background: var(--bg-tertiary); padding: 6px 12px; border-radius: 8px; font-size: 12px; color: var(--text-secondary); }
+        .stat-chip b { color: var(--text-primary); }
+
+        /* ===== TOAST ===== */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+        .toast { padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 8px; }
         .toast-success { background: #065f46; color: #6ee7b7; }
         .toast-error { background: #7f1d1d; color: #fca5a5; }
         .toast-info { background: #1e3a5f; color: #93c5fd; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        .status-bar {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            padding: 4px 16px;
-            font-size: 11px;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-            grid-column: 1 / -1;
-        }
+        /* ===== STATUS BAR ===== */
+        .status-bar { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 3px 12px; font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; grid-column: 1/-1; }
 
+        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 768px) {
+            .app { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+            .header-subtitle, .header-user span:not(.header-user-avatar) { display: none; }
+            .header-logo { font-size: 15px; }
+            .search-box input { width: 120px; font-size: 12px; }
+            .search-results { width: 90vw; right: -40px; }
+            .sidebar { position: fixed; top: 0; left: 0; width: 280px; height: 100vh; height: 100dvh; z-index: 50; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+            .sidebar.open { transform: translateX(0); }
+            .tab { max-width: 120px; padding: 5px 10px; font-size: 11px; }
+            .editor-toolbar { padding: 6px 8px; }
+            .editor-path { font-size: 10px; }
+            .btn { padding: 6px 10px; font-size: 11px; min-height: 38px; }
+            .btn .btn-text { display: none; }
+            .file-info-banner { padding: 8px 10px; }
+            .file-info-desc { display: none; }
+            .file-info-tips { gap: 3px; }
+            .file-info-tip { font-size: 9px; padding: 2px 6px; }
+            .status-bar { display: none; }
+            .history-panel { width: 100vw; max-width: 100vw; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- ========== LOGIN ========== -->
-    <div class="login-page" id="login-page">
-        <div class="login-card">
-            <div class="login-logo">⚡</div>
-            <div class="login-title">Agent Files Manager</div>
-            <div class="login-subtitle">Connexion à l'éditeur agents Hermes</div>
-            <div class="login-error" id="login-error"></div>
-            <form onsubmit="handleLogin(event)">
-                <div class="login-field">
-                    <label for="login-user">Utilisateur</label>
-                    <input type="text" id="login-user" autocomplete="username" autofocus value="jb" />
-                </div>
-                <div class="login-field">
-                    <label for="login-pass">Mot de passe</label>
-                    <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••" />
-                </div>
-                <button type="submit" class="login-btn" id="login-btn">Se connecter</button>
-            </form>
+<!-- LOGIN -->
+<div class="login-page" id="login-page">
+    <div class="login-card">
+        <div class="login-logo">⚡</div>
+        <div class="login-title">Agent Files Manager</div>
+        <div class="login-subtitle">Connexion à l'éditeur agents Hermes</div>
+        <div class="login-error" id="login-error"></div>
+        <form onsubmit="handleLogin(event)">
+            <div class="login-field"><label>Utilisateur</label><input type="text" id="login-user" autocomplete="username" autofocus value="jb" /></div>
+            <div class="login-field"><label>Mot de passe</label><input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••" /></div>
+            <button type="submit" class="login-btn" id="login-btn">Se connecter</button>
+        </form>
+    </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+    <header class="header">
+        <div class="header-left">
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <span class="header-logo">⚡ Agent Files Manager</span>
+            <span class="header-subtitle">Éditeur agents Hermes</span>
         </div>
+        <div class="header-right">
+            <div class="search-box"><input type="text" id="search-input" placeholder="Rechercher..." /><div class="search-results" id="search-results"></div></div>
+            <div class="header-user"><div class="header-user-avatar" id="user-avatar">JB</div><span id="user-name">jb</span></div>
+            <button class="btn-logout" onclick="handleLogout()">⏻</button>
+        </div>
+    </header>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="editor-area">
+        <div class="tab-bar" id="tab-bar"></div>
+        <div class="editor-toolbar" id="editor-toolbar" style="display:none">
+            <span class="editor-path" id="editor-path"></span>
+            <div class="editor-actions">
+                <button class="btn btn-warning" onclick="openAnalyze()" title="Analyser & Améliorer"><span>✨</span><span class="btn-text">Améliorer</span></button>
+                <button class="btn btn-secondary" onclick="openHistory()" title="Historique des versions"><span>🕐</span><span class="btn-text">Historique</span></button>
+                <button class="btn btn-secondary" id="btn-revert" onclick="revertFile()"><span>↩</span><span class="btn-text">Annuler</span></button>
+                <button class="btn btn-primary" id="btn-save" onclick="saveFile()" disabled><span>💾</span><span class="btn-text">Sauvegarder</span></button>
+            </div>
+        </div>
+        <div class="file-info-banner" id="file-info-banner">
+            <span class="file-info-icon" id="file-info-icon"></span>
+            <div class="file-info-content"><div class="file-info-title" id="file-info-title"></div><div class="file-info-desc" id="file-info-desc"></div><div class="file-info-tips" id="file-info-tips"></div></div>
+            <button class="file-info-close" onclick="closeBanner()">✕</button>
+        </div>
+        <div id="editor-container"><div class="empty-state" id="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">Sélectionne un fichier</div><div class="empty-state-hint">Clique sur un agent dans la barre latérale</div></div></div>
+    </main>
+    <footer class="status-bar"><span id="status-left">Prêt</span><span>v2.0</span></footer>
+</div>
+
+<!-- HISTORY PANEL -->
+<div class="history-panel" id="history-panel">
+    <div class="history-header"><span class="history-title">🕐 Historique des versions</span><button class="history-close" onclick="closeHistory()">✕</button></div>
+    <div class="history-list" id="history-list"></div>
+    <div class="history-diff" id="history-diff" style="display:none"></div>
+    <div class="history-actions" id="history-actions" style="display:none">
+        <button class="btn btn-success" onclick="restoreVersion()" style="width:100%"><span>🔄</span> Restaurer cette version</button>
     </div>
+</div>
 
-    <!-- ========== APP ========== -->
-    <div class="app" id="app">
-        <header class="header">
-            <div class="header-left">
-                <span class="header-logo">⚡ Agent Files Manager</span>
-                <span class="header-subtitle">Éditeur de configuration agents Hermes</span>
-            </div>
-            <div class="header-right">
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Rechercher dans les fichiers..." />
-                    <div class="search-results" id="search-results"></div>
-                </div>
-                <div class="header-user">
-                    <div class="header-user-avatar" id="user-avatar">JB</div>
-                    <span id="user-name">jb</span>
-                </div>
-                <button class="btn-logout" onclick="handleLogout()">Déconnexion</button>
-            </div>
-        </header>
-
-        <aside class="sidebar" id="sidebar"></aside>
-
-        <main class="editor-area">
-            <div class="tab-bar" id="tab-bar"></div>
-            <div class="editor-toolbar" id="editor-toolbar" style="display:none;">
-                <span class="editor-path" id="editor-path"></span>
-                <div class="editor-actions">
-                    <button class="btn btn-secondary" id="btn-revert" onclick="revertFile()">↩ Annuler</button>
-                    <button class="btn btn-primary" id="btn-save" onclick="saveFile()" disabled>💾 Sauvegarder</button>
-                </div>
-            </div>
-            <div class="file-info-banner" id="file-info-banner">
-                <span class="file-info-icon" id="file-info-icon"></span>
-                <div class="file-info-content">
-                    <div class="file-info-title" id="file-info-title"></div>
-                    <div class="file-info-desc" id="file-info-desc"></div>
-                    <div class="file-info-tips" id="file-info-tips"></div>
-                </div>
-                <button class="file-info-close" onclick="closeBanner()">✕</button>
-            </div>
-            <div id="editor-container">
-                <div class="empty-state" id="empty-state">
-                    <div class="empty-state-icon">📝</div>
-                    <div class="empty-state-text">Sélectionne un fichier à éditer</div>
-                    <div class="empty-state-hint">Clique sur un agent dans la barre latérale pour voir ses fichiers</div>
-                </div>
-            </div>
-        </main>
-
-        <footer class="status-bar">
-            <span id="status-left">Prêt</span>
-            <span id="status-right">Agent Files Manager v1.1</span>
-        </footer>
+<!-- ANALYZE MODAL -->
+<div class="modal-overlay" id="analyze-modal">
+    <div class="modal">
+        <div class="modal-header"><span class="modal-title">✨ Analyse & Amélioration</span><button class="modal-close" onclick="closeAnalyze()">✕</button></div>
+        <div class="modal-body" id="analyze-body"><div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Analyse en cours...</div></div>
+        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeAnalyze()">Fermer</button></div>
     </div>
+</div>
 
-    <div class="toast-container" id="toast-container"></div>
+<div class="toast-container" id="toast-container"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+<script>
+const S = { agents: [], openTabs: [], activeTab: null, editor: null, editorReady: false, currentUser: null, selectedVersion: null };
+const pathParts = window.location.pathname.split('/').filter(Boolean);
+const basePath = pathParts.length > 0 ? '/' + pathParts[0] : '';
+const API = basePath + '/api';
+const isMobile = () => window.innerWidth <= 768;
 
-    <!-- Monaco Editor CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+// ===== AUTH =====
+async function checkAuth() {
+    try { const r = await fetch(`${API}/me`, {credentials:'same-origin'}); if (r.ok) { const u = await r.json(); S.currentUser=u; showApp(u); return; } } catch(e){}
+    showLogin();
+}
+async function handleLogin(e) {
+    e.preventDefault();
+    const btn=document.getElementById('login-btn'), err=document.getElementById('login-error'), u=document.getElementById('login-user').value.trim(), p=document.getElementById('login-pass').value;
+    if(!u||!p){err.textContent='Remplis les deux champs';err.classList.add('show');return;}
+    btn.disabled=true;btn.textContent='Connexion...';err.classList.remove('show');
+    try{const r=await fetch(`${API}/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p}),credentials:'same-origin'});
+    if(r.ok){const d=await r.json();S.currentUser={username:d.username};showApp(S.currentUser);}else{err.textContent='Identifiants incorrects';err.classList.add('show');document.getElementById('login-pass').value='';document.getElementById('login-pass').focus();}
+    }catch(e){err.textContent='Erreur serveur';err.classList.add('show');}finally{btn.disabled=false;btn.textContent='Se connecter';}
+}
+async function handleLogout(){await fetch(`${API}/logout`,{method:'POST',credentials:'same-origin'});S.currentUser=null;S.agents=[];S.openTabs=[];S.activeTab=null;showLogin();}
+function showLogin(){document.getElementById('login-page').style.display='flex';document.getElementById('app').classList.remove('active');}
+function showApp(u){document.getElementById('login-page').style.display='none';document.getElementById('app').classList.add('active');document.getElementById('user-name').textContent=u.username;document.getElementById('user-avatar').textContent=u.username.substring(0,2).toUpperCase();init();}
 
-    <script>
-        // === STATE ===
-        const state = {
-            agents: [],
-            openTabs: [],
-            activeTab: null,
-            editor: null,
-            editorReady: false,
-            currentUser: null,
-        };
+// ===== API =====
+async function apiFetch(url, opts={}){opts.credentials='same-origin';const r=await fetch(url,opts);if(r.status===401){showLogin();throw new Error('Session expirée');}return r;}
+async function loadAgents(){try{const r=await apiFetch(`${API}/agents`);S.agents=await r.json();}catch(e){if(e.message!=='Session expirée')toast('Erreur API','error');}}
 
-        // Détecter automatiquement le base path
-        const pathParts = window.location.pathname.split('/').filter(Boolean);
-        const basePath = pathParts.length > 0 ? '/' + pathParts[0] : '';
-        const API_BASE = basePath + '/api';
+// ===== SIDEBAR =====
+function toggleSidebar(open) {
+    const sb=document.getElementById('sidebar'), ov=document.getElementById('sidebar-overlay');
+    const isOpen = open !== undefined ? open : !sb.classList.contains('open');
+    sb.classList.toggle('open', isOpen); ov.classList.toggle('visible', isOpen);
+}
+function renderSidebar() {
+    document.getElementById('sidebar').innerHTML = S.agents.map(a => `
+        <div class="agent-section">
+            <div class="agent-header" onclick="toggleAgent('${a.id}')">
+                <span class="agent-emoji">${a.emoji}</span>
+                <div class="agent-info"><div class="agent-name">${a.name}</div><div class="agent-role">${a.role}</div></div>
+                <span class="agent-toggle" id="toggle-${a.id}">▶</span>
+            </div>
+            <div class="file-list" id="files-${a.id}">
+                ${a.files.filter(f=>f.exists).map(f=>`
+                    <div class="file-item" id="file-${a.id}-${f.path.replace(/[\/\.]/g,'-')}" onclick="openFile('${a.id}','${f.path}','${f.label}');${isMobile()?'toggleSidebar(false)':''}">
+                        <span class="file-icon">${f.icon}</span>
+                        <div class="file-info"><div class="file-label">${f.label}</div><div class="file-desc">${f.description}</div></div>
+                        <div class="file-meta">${formatSize(f.size)}${f.versions?` <span class="file-versions-badge">${f.versions}v</span>`:''}</div>
+                    </div>`).join('')}
+            </div>
+        </div>`).join('');
+    if(S.agents.length>0)toggleAgent(S.agents[0].id);
+}
+function toggleAgent(id){document.getElementById(`files-${id}`).classList.toggle('open');document.getElementById(`toggle-${id}`).classList.toggle('open');}
 
-        // === AUTH ===
-        async function checkAuth() {
-            try {
-                const res = await fetch(`${API_BASE}/me`, { credentials: 'same-origin' });
-                if (res.ok) {
-                    const user = await res.json();
-                    state.currentUser = user;
-                    showApp(user);
-                    return true;
-                }
-            } catch (e) {}
-            showLogin();
-            return false;
-        }
+// ===== TABS =====
+function renderTabs(){
+    document.getElementById('tab-bar').innerHTML=S.openTabs.map((t,i)=>{
+        const mod=t.modified!==t.original;
+        return `<div class="tab ${i===S.activeTab?'active':''}" onclick="switchTab(${i})"><span class="tab-modified ${mod?'show':''}"></span><span>${t.label}</span><span class="tab-close" onclick="event.stopPropagation();closeTab(${i})">×</span></div>`;
+    }).join('');
+    const active=document.querySelector('.tab.active');if(active)active.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+}
+function switchTab(i){
+    if(S.activeTab!==null&&S.editor)S.openTabs[S.activeTab].modified=S.editor.getValue();
+    S.activeTab=i;const t=S.openTabs[i];
+    if(S.editor){const l=t.file_path.endsWith('.yaml')?'yaml':'markdown';monaco.editor.setModelLanguage(S.editor.getModel(),l);S.editor.setValue(t.modified);}
+    updateEditorUI();renderTabs();highlightActiveFile();showBanner(t.file_path);
+}
+function closeTab(i){
+    const t=S.openTabs[i];if(t.modified!==t.original&&!confirm(`"${t.label}" modifié. Fermer ?`))return;
+    S.openTabs.splice(i,1);
+    if(!S.openTabs.length){S.activeTab=null;showEmptyState();}else{S.activeTab=Math.min(i,S.openTabs.length-1);switchTab(S.activeTab);}
+    renderTabs();
+}
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('login-btn');
-            const errorEl = document.getElementById('login-error');
-            const username = document.getElementById('login-user').value.trim();
-            const password = document.getElementById('login-pass').value;
+// ===== OPEN/SAVE =====
+async function openFile(agentId, filePath, label){
+    const ex=S.openTabs.findIndex(t=>t.agent_id===agentId&&t.file_path===filePath);if(ex!==-1){switchTab(ex);return;}
+    try{
+        const d=await(await apiFetch(`${API}/agents/${agentId}/files/${filePath}`)).json();
+        if(S.activeTab!==null&&S.editor)S.openTabs[S.activeTab].modified=S.editor.getValue();
+        S.openTabs.push({agent_id:agentId,file_path:filePath,label,original:d.content,modified:d.content});
+        S.activeTab=S.openTabs.length-1;hideEmptyState();
+        if(S.editor){const l=filePath.endsWith('.yaml')?'yaml':'markdown';monaco.editor.setModelLanguage(S.editor.getModel(),l);S.editor.setValue(d.content);}
+        updateEditorUI();renderTabs();highlightActiveFile();showBanner(filePath);
+        document.getElementById('status-left').textContent=`${label} — ${formatSize(d.size)}`;
+    }catch(e){toast(`Erreur: ${e.message}`,'error');}
+}
+async function saveFile(){
+    if(S.activeTab===null)return;const t=S.openTabs[S.activeTab],c=S.editor.getValue();
+    try{document.getElementById('btn-save').disabled=true;
+    await apiFetch(`${API}/agents/${t.agent_id}/files/${t.file_path}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:c})});
+    t.original=c;t.modified=c;toast(`${t.label} sauvegardé ✅`,'success');renderTabs();updateSaveBtn();
+    }catch(e){toast(`Erreur: ${e.message}`,'error');}finally{document.getElementById('btn-save').innerHTML='<span>💾</span><span class="btn-text">Sauvegarder</span>';}
+}
+function revertFile(){if(S.activeTab===null)return;const t=S.openTabs[S.activeTab];if(confirm('Annuler les modifications ?')){S.editor.setValue(t.original);t.modified=t.original;renderTabs();updateSaveBtn();toast('Annulé','info');}}
 
-            if (!username || !password) {
-                errorEl.textContent = 'Remplis les deux champs';
-                errorEl.classList.add('show');
-                return;
-            }
+// ===== HISTORY =====
+async function openHistory(){
+    if(S.activeTab===null)return;const t=S.openTabs[S.activeTab];S.selectedVersion=null;
+    document.getElementById('history-panel').classList.add('open');document.getElementById('history-diff').style.display='none';document.getElementById('history-actions').style.display='none';
+    try{const r=await(await apiFetch(`${API}/agents/${t.agent_id}/versions/${t.file_path}`)).json();
+    const list=document.getElementById('history-list');
+    if(!r.length){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-muted)">Aucune version précédente</div>';return;}
+    list.innerHTML=r.map(v=>`<div class="history-item" onclick="selectVersion('${v.timestamp}')"><div class="history-date">📄 ${v.date} à ${v.time}</div><div class="history-size">${formatSize(v.size)}</div></div>`).join('');
+    }catch(e){toast('Erreur historique','error');}
+}
+async function selectVersion(ts){
+    if(S.activeTab===null)return;const t=S.openTabs[S.activeTab];S.selectedVersion=ts;
+    document.querySelectorAll('.history-item').forEach(el=>el.classList.remove('active'));event.currentTarget?.classList.add('active');
+    try{const r=await(await apiFetch(`${API}/agents/${t.agent_id}/diff/${t.file_path}/${ts}`)).json();
+    const diffEl=document.getElementById('history-diff');
+    diffEl.innerHTML=r.diff.map(l=>{if(l.startsWith('+'))return`<div class="diff-add">${esc(l)}</div>`;if(l.startsWith('-'))return`<div class="diff-del">${esc(l)}</div>`;if(l.startsWith('@'))return`<div class="diff-info">${esc(l)}</div>`;return`<div>${esc(l)}</div>`;}).join('');
+    diffEl.style.display='block';document.getElementById('history-actions').style.display='block';
+    }catch(e){toast('Erreur diff','error');}
+}
+async function restoreVersion(){
+    if(!S.selectedVersion||S.activeTab===null)return;const t=S.openTabs[S.activeTab];
+    if(!confirm('Restaurer cette version ? (la version actuelle sera sauvegardée)'))return;
+    try{await apiFetch(`${API}/agents/${t.agent_id}/restore/${t.file_path}/${S.selectedVersion}`,{method:'POST'});
+    const d=await(await apiFetch(`${API}/agents/${t.agent_id}/files/${t.file_path}`)).json();
+    S.editor.setValue(d.content);t.original=d.content;t.modified=d.content;renderTabs();updateSaveBtn();
+    toast('Version restaurée ✅','success');closeHistory();
+    }catch(e){toast('Erreur restauration','error');}
+}
+function closeHistory(){document.getElementById('history-panel').classList.remove('open');}
 
-            btn.disabled = true;
-            btn.textContent = 'Connexion...';
-            errorEl.classList.remove('show');
+// ===== ANALYZE =====
+async function openAnalyze(){
+    if(S.activeTab===null)return;const t=S.openTabs[S.activeTab];
+    document.getElementById('analyze-modal').classList.add('open');
+    document.getElementById('analyze-body').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ Analyse en cours...</div>';
+    try{const r=await(await apiFetch(`${API}/agents/${t.agent_id}/analyze/${t.file_path}`)).json();
+    const scoreClass=r.score>=80?'score-good':r.score>=50?'score-ok':'score-bad';
+    const scoreLabel=r.score>=80?'Bon fichier !':r.score>=50?'Peut être amélioré':'À retravailler';
+    let html=`<div class="score-ring ${scoreClass}">${r.score}</div><div class="score-label">${scoreLabel}</div>`;
+    html+=`<div class="stats-row"><div class="stat-chip"><b>${r.stats.characters}</b> caractères</div><div class="stat-chip"><b>${r.stats.lines}</b> lignes</div><div class="stat-chip"><b>${r.stats.words}</b> mots</div><div class="stat-chip"><b>${r.stats.headers}</b> sections</div></div>`;
+    if(r.issues.length){html+=r.issues.map(i=>`<div class="issue-item"><div class="issue-icon">${i.icon}</div><div class="issue-content"><div class="issue-title">${i.title}</div><div class="issue-desc">${i.desc}</div><span class="issue-badge ${i.severity}">${i.severity==='danger'?'Critique':i.severity==='warning'?'Attention':'Info'}</span></div></div>`).join('');}
+    else{html+='<div style="text-align:center;padding:20px;color:var(--success)">✅ Aucun problème détecté !</div>';}
+    document.getElementById('analyze-body').innerHTML=html;
+    }catch(e){document.getElementById('analyze-body').innerHTML=`<div style="color:var(--danger);padding:20px">Erreur: ${e.message}</div>`;}
+}
+function closeAnalyze(){document.getElementById('analyze-modal').classList.remove('open');}
 
-            try {
-                const res = await fetch(`${API_BASE}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                    credentials: 'same-origin',
-                });
+// ===== FILE GUIDES =====
+const GUIDES={'SOUL.md':{icon:'🧬',title:'SOUL.md — Personnalité et règles',desc:'Définit QUI est l\'agent : personnalité, rôle, compétences, règles absolues, style de communication.',tips:[{text:'✍️ Structure en ## sections',type:''},{text:'🎯 Rôle et limites précis',type:''},{text:'⚠️ Règles absolues toujours respectées',type:'warning'},{text:'🚫 Pas de données sensibles',type:'danger'},{text:'📏 < 5000 caractères',type:'warning'}]},'MEMORY.md':{icon:'🧠',title:'MEMORY.md — Mémoire persistante',desc:'Notes prises au fil des conversations. Injectée à CHAQUE tour comme contexte.',tips:[{text:'📐 Faits déclaratifs uniquement',type:''},{text:'🧹 Nettoyer les infos obsolètes',type:'warning'},{text:'⚡ Garder compact',type:'warning'},{text:'❌ Pas de logs/TODO',type:'danger'}]},'USER.md':{icon:'👤',title:'USER.md — Profil utilisateur',desc:'Décrit qui tu es : nom, préférences, timezone, style de communication.',tips:[{text:'👋 Nom, timezone',type:''},{text:'💬 Style préféré',type:''},{text:'🔧 Niveau technique',type:''},{text:'📏 < 500 caractères',type:'warning'}]},'config.yaml':{icon:'⚙️',title:'config.yaml — Configuration technique',desc:'Modèle IA, provider, timeouts, toolsets. Le moteur de l\'agent.',tips:[{text:'🤖 model.default = modèle IA',type:''},{text:'⚠️ Indentation YAML (2 espaces)',type:'warning'},{text:'🚫 Ne pas toucher aux champs inconnus',type:'danger'},{text:'🔄 Restart nécessaire après modif',type:'warning'}]},'_dated':{icon:'📅',title:'Souvenir daté — Archive',desc:'Résumé automatique d\'une conversation passée.',tips:[{text:'📖 Lecture seule recommandée',type:''},{text:'💡 Utile pour retrouver l\'historique',type:''}]}};
+function getGuide(fp){const n=fp.split('/').pop();if(GUIDES[n])return GUIDES[n];if(/^20\d{2}/.test(n))return GUIDES['_dated'];return null;}
+function showBanner(fp){const g=getGuide(fp),b=document.getElementById('file-info-banner');if(!g){b.classList.remove('show');return;}document.getElementById('file-info-icon').textContent=g.icon;document.getElementById('file-info-title').textContent=g.title;document.getElementById('file-info-desc').textContent=g.desc;document.getElementById('file-info-tips').innerHTML=g.tips.map(t=>`<span class="file-info-tip ${t.type}">${t.text}</span>`).join('');b.classList.add('show');}
+function closeBanner(){document.getElementById('file-info-banner').classList.remove('show');}
 
-                if (res.ok) {
-                    const data = await res.json();
-                    state.currentUser = { username: data.username };
-                    showApp({ username: data.username });
-                } else {
-                    errorEl.textContent = 'Identifiants incorrects';
-                    errorEl.classList.add('show');
-                    document.getElementById('login-pass').value = '';
-                    document.getElementById('login-pass').focus();
-                }
-            } catch (e) {
-                errorEl.textContent = 'Erreur de connexion au serveur';
-                errorEl.classList.add('show');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Se connecter';
-            }
-        }
+// ===== EDITOR =====
+function initEditor(){
+    require.config({paths:{vs:'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs'}});
+    require(['vs/editor/editor.main'],function(){
+        monaco.editor.defineTheme('agent-dark',{base:'vs-dark',inherit:true,rules:[],colors:{'editor.background':'#0f1117','editor.lineHighlightBackground':'#1a1d27','editorGutter.background':'#0f1117'}});
+        const mob=isMobile();
+        S.editor=monaco.editor.create(document.getElementById('editor-container'),{
+            value:'',language:'markdown',theme:'agent-dark',
+            fontSize:14,fontFamily:"'JetBrains Mono','Fira Code','Consolas',monospace",
+            lineNumbers:mob?'off':'on',minimap:{enabled:!mob},wordWrap:'on',automaticLayout:true,
+            renderWhitespace:'boundary',scrollBeyondLastLine:false,padding:{top:10},
+            glyphMargin:!mob,lineDecorationsWidth:mob?0:10,lineNumbersMinChars:mob?2:5,
+            scrollbar:{verticalScrollbarSize:mob?12:10},
+        });
+        S.editor.onDidChangeModelContent(()=>{if(S.activeTab!==null){S.openTabs[S.activeTab].modified=S.editor.getValue();updateSaveBtn();renderTabs();}});
+        S.editor.addAction({id:'save',label:'Save',keybindings:[monaco.KeyMod.CtrlCmd|monaco.KeyCode.KeyS],run:()=>saveFile()});
+        S.editorReady=true;
+    });
+}
 
-        async function handleLogout() {
-            await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'same-origin' });
-            state.currentUser = null;
-            state.agents = [];
-            state.openTabs = [];
-            state.activeTab = null;
-            showLogin();
-        }
+// ===== SEARCH =====
+function initSearch(){
+    const inp=document.getElementById('search-input'),res=document.getElementById('search-results');let db;
+    inp.addEventListener('input',()=>{clearTimeout(db);db=setTimeout(async()=>{const q=inp.value.trim();if(q.length<2){res.classList.remove('active');return;}
+    try{const r=await(await apiFetch(`${API}/search?q=${encodeURIComponent(q)}`)).json();
+    res.innerHTML=r.length?r.map(r=>r.matches.slice(0,3).map(m=>`<div class="search-result-item" onclick="openFile('${r.agent_id}','${r.file_path}','${r.file_label}')"><div class="search-result-agent">${r.agent_name}</div><div class="search-result-file">${r.file_label}</div><div class="search-result-line">L${m.line}: ${esc(m.text)}</div></div>`).join('')).join(''):'<div style="padding:14px;color:var(--text-muted)">Aucun résultat</div>';
+    res.classList.add('active');}catch(e){}},300);});
+    inp.addEventListener('blur',()=>setTimeout(()=>res.classList.remove('active'),200));
+}
 
-        function showLogin() {
-            document.getElementById('login-page').style.display = 'flex';
-            document.getElementById('app').classList.remove('active');
-            document.getElementById('login-user').focus();
-        }
+// ===== UI HELPERS =====
+function updateEditorUI(){
+    const tb=document.getElementById('editor-toolbar'),p=document.getElementById('editor-path');
+    if(S.activeTab!==null){const t=S.openTabs[S.activeTab],a=S.agents.find(a=>a.id===t.agent_id);tb.style.display='flex';p.textContent=`${a?.emoji||''} ${a?.name||t.agent_id} → ${t.file_path}`;updateSaveBtn();}else{tb.style.display='none';}
+}
+function updateSaveBtn(){const b=document.getElementById('btn-save');if(S.activeTab===null)return;b.disabled=S.openTabs[S.activeTab].modified===S.openTabs[S.activeTab].original;}
+function highlightActiveFile(){document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('active'));if(S.activeTab!==null){const t=S.openTabs[S.activeTab];document.getElementById(`file-${t.agent_id}-${t.file_path.replace(/[\/\.]/g,'-')}`)?.classList.add('active');}}
+function showEmptyState(){document.getElementById('empty-state').style.display='flex';document.getElementById('editor-toolbar').style.display='none';document.getElementById('file-info-banner').classList.remove('show');if(S.editor)S.editor.getModel()?.setValue('');}
+function hideEmptyState(){document.getElementById('empty-state').style.display='none';}
+function formatSize(b){return b<1024?b+' B':(b/1024).toFixed(1)+' KB';}
+function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+function toast(m,type='info'){const c=document.getElementById('toast-container'),el=document.createElement('div');el.className=`toast toast-${type}`;el.textContent=m;c.appendChild(el);setTimeout(()=>el.remove(),4000);}
 
-        function showApp(user) {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('app').classList.add('active');
-            document.getElementById('user-name').textContent = user.username;
-            document.getElementById('user-avatar').textContent = user.username.substring(0, 2).toUpperCase();
-            init();
-        }
+// ===== SWIPE SIDEBAR =====
+let touchStartX=0;
+document.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;});
+document.addEventListener('touchmove',e=>{
+    const dx=e.touches[0].clientX-touchStartX;
+    const sb=document.getElementById('sidebar');
+    if(dx>60&&touchStartX<30&&!sb.classList.contains('open'))toggleSidebar(true);
+    if(dx<-60&&sb.classList.contains('open'))toggleSidebar(false);
+});
 
-        // === INIT ===
-        async function init() {
-            await loadAgents();
-            renderSidebar();
-            if (!state.editorReady) initEditor();
-            initSearch();
-        }
-
-        // === API (toutes les requêtes avec credentials) ===
-        async function apiFetch(url, options = {}) {
-            options.credentials = 'same-origin';
-            const res = await fetch(url, options);
-            if (res.status === 401) {
-                showLogin();
-                throw new Error('Session expirée');
-            }
-            return res;
-        }
-
-        async function loadAgents() {
-            try {
-                const res = await apiFetch(`${API_BASE}/agents`);
-                state.agents = await res.json();
-            } catch (e) {
-                if (e.message !== 'Session expirée') toast('Erreur de connexion à l\'API', 'error');
-            }
-        }
-
-        async function fetchFile(agentId, filePath) {
-            const res = await apiFetch(`${API_BASE}/agents/${agentId}/files/${filePath}`);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.json();
-        }
-
-        async function saveFileToServer(agentId, filePath, content) {
-            const res = await apiFetch(`${API_BASE}/agents/${agentId}/files/${filePath}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content }),
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.json();
-        }
-
-        // === SIDEBAR ===
-        function renderSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.innerHTML = state.agents.map(agent => `
-                <div class="agent-section">
-                    <div class="agent-header" onclick="toggleAgent('${agent.id}')">
-                        <span class="agent-emoji">${agent.emoji}</span>
-                        <div class="agent-info">
-                            <div class="agent-name">${agent.name}</div>
-                            <div class="agent-role">${agent.role}</div>
-                        </div>
-                        <span class="agent-toggle" id="toggle-${agent.id}">▶</span>
-                    </div>
-                    <div class="file-list" id="files-${agent.id}">
-                        ${agent.files.filter(f => f.exists).map(f => `
-                            <div class="file-item" id="file-${agent.id}-${f.path.replace(/[\/\.]/g, '-')}"
-                                 onclick="openFile('${agent.id}', '${f.path}', '${f.label}')">
-                                <span class="file-icon">${f.icon}</span>
-                                <div class="file-info">
-                                    <div class="file-label">${f.label}</div>
-                                    <div class="file-desc">${f.description}</div>
-                                </div>
-                                <span class="file-size">${formatSize(f.size)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-            if (state.agents.length > 0) toggleAgent(state.agents[0].id);
-        }
-
-        function toggleAgent(agentId) {
-            const list = document.getElementById(`files-${agentId}`);
-            const toggle = document.getElementById(`toggle-${agentId}`);
-            list.classList.toggle('open');
-            toggle.classList.toggle('open');
-        }
-
-        // === TABS ===
-        function renderTabs() {
-            const bar = document.getElementById('tab-bar');
-            bar.innerHTML = state.openTabs.map((tab, i) => {
-                const isModified = tab.modified !== tab.original;
-                return `
-                    <div class="tab ${i === state.activeTab ? 'active' : ''}" onclick="switchTab(${i})">
-                        <span class="tab-modified ${isModified ? 'show' : ''}"></span>
-                        <span>${tab.label}</span>
-                        <span class="tab-close" onclick="event.stopPropagation(); closeTab(${i})">×</span>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function switchTab(index) {
-            if (state.activeTab !== null && state.editor) {
-                state.openTabs[state.activeTab].modified = state.editor.getValue();
-            }
-            state.activeTab = index;
-            const tab = state.openTabs[index];
-            if (state.editor) {
-                const lang = tab.file_path.endsWith('.yaml') ? 'yaml' : 'markdown';
-                monaco.editor.setModelLanguage(state.editor.getModel(), lang);
-                state.editor.setValue(tab.modified);
-            }
-            updateEditorUI();
-            renderTabs();
-            highlightActiveFile();
-            showBanner(tab.file_path);
-        }
-
-        function closeTab(index) {
-            const tab = state.openTabs[index];
-            if (tab.modified !== tab.original) {
-                if (!confirm(`"${tab.label}" a été modifié. Fermer sans sauvegarder ?`)) return;
-            }
-            state.openTabs.splice(index, 1);
-            if (state.openTabs.length === 0) {
-                state.activeTab = null;
-                showEmptyState();
-            } else {
-                state.activeTab = Math.min(index, state.openTabs.length - 1);
-                switchTab(state.activeTab);
-            }
-            renderTabs();
-        }
-
-        // === OPEN FILE ===
-        async function openFile(agentId, filePath, label) {
-            const existing = state.openTabs.findIndex(
-                t => t.agent_id === agentId && t.file_path === filePath
-            );
-            if (existing !== -1) { switchTab(existing); return; }
-
-            try {
-                document.getElementById('status-left').textContent = `Chargement de ${label}...`;
-                const data = await fetchFile(agentId, filePath);
-
-                if (state.activeTab !== null && state.editor) {
-                    state.openTabs[state.activeTab].modified = state.editor.getValue();
-                }
-
-                state.openTabs.push({
-                    agent_id: agentId,
-                    file_path: filePath,
-                    label: label,
-                    original: data.content,
-                    modified: data.content,
-                });
-
-                state.activeTab = state.openTabs.length - 1;
-                hideEmptyState();
-
-                if (state.editor) {
-                    const lang = filePath.endsWith('.yaml') ? 'yaml' : 'markdown';
-                    monaco.editor.setModelLanguage(state.editor.getModel(), lang);
-                    state.editor.setValue(data.content);
-                }
-
-                updateEditorUI();
-                renderTabs();
-                highlightActiveFile();
-                showBanner(filePath);
-                document.getElementById('status-left').textContent = `${label} — ${formatSize(data.size)}`;
-            } catch (e) {
-                toast(`Erreur chargement : ${e.message}`, 'error');
-                document.getElementById('status-left').textContent = 'Erreur';
-            }
-        }
-
-        // === SAVE / REVERT ===
-        async function saveFile() {
-            if (state.activeTab === null) return;
-            const tab = state.openTabs[state.activeTab];
-            const content = state.editor.getValue();
-            try {
-                document.getElementById('btn-save').disabled = true;
-                document.getElementById('btn-save').innerHTML = '⏳ Sauvegarde...';
-                const result = await saveFileToServer(tab.agent_id, tab.file_path, content);
-                tab.original = content;
-                tab.modified = content;
-                toast(`${tab.label} sauvegardé ✅`, 'success');
-                renderTabs();
-                updateSaveButton();
-            } catch (e) {
-                toast(`Erreur sauvegarde : ${e.message}`, 'error');
-            } finally {
-                document.getElementById('btn-save').innerHTML = '💾 Sauvegarder';
-            }
-        }
-
-        function revertFile() {
-            if (state.activeTab === null) return;
-            const tab = state.openTabs[state.activeTab];
-            if (confirm('Annuler toutes les modifications ?')) {
-                state.editor.setValue(tab.original);
-                tab.modified = tab.original;
-                renderTabs();
-                updateSaveButton();
-                toast('Modifications annulées', 'info');
-            }
-        }
-
-        // === EDITOR INIT ===
-        function initEditor() {
-            require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
-            require(['vs/editor/editor.main'], function () {
-                monaco.editor.defineTheme('agent-dark', {
-                    base: 'vs-dark',
-                    inherit: true,
-                    rules: [],
-                    colors: {
-                        'editor.background': '#0f1117',
-                        'editor.lineHighlightBackground': '#1a1d27',
-                        'editorGutter.background': '#0f1117',
-                    }
-                });
-
-                state.editor = monaco.editor.create(document.getElementById('editor-container'), {
-                    value: '',
-                    language: 'markdown',
-                    theme: 'agent-dark',
-                    fontSize: 14,
-                    fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
-                    lineNumbers: 'on',
-                    minimap: { enabled: true },
-                    wordWrap: 'on',
-                    automaticLayout: true,
-                    renderWhitespace: 'boundary',
-                    scrollBeyondLastLine: false,
-                    padding: { top: 12 },
-                    bracketPairColorization: { enabled: true },
-                });
-
-                state.editor.onDidChangeModelContent(() => {
-                    if (state.activeTab !== null) {
-                        state.openTabs[state.activeTab].modified = state.editor.getValue();
-                        updateSaveButton();
-                        renderTabs();
-                    }
-                });
-
-                state.editor.addAction({
-                    id: 'save-file',
-                    label: 'Sauvegarder',
-                    keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
-                    run: () => saveFile(),
-                });
-
-                state.editorReady = true;
-            });
-        }
-
-        // === SEARCH ===
-        function initSearch() {
-            const input = document.getElementById('search-input');
-            const results = document.getElementById('search-results');
-            let debounce;
-
-            input.addEventListener('input', () => {
-                clearTimeout(debounce);
-                debounce = setTimeout(async () => {
-                    const q = input.value.trim();
-                    if (q.length < 2) { results.classList.remove('active'); return; }
-                    try {
-                        const res = await apiFetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`);
-                        const data = await res.json();
-                        renderSearchResults(data);
-                    } catch (e) { console.error(e); }
-                }, 300);
-            });
-            input.addEventListener('blur', () => {
-                setTimeout(() => results.classList.remove('active'), 200);
-            });
-        }
-
-        function renderSearchResults(data) {
-            const results = document.getElementById('search-results');
-            if (data.length === 0) {
-                results.innerHTML = '<div style="padding:14px;color:var(--text-muted)">Aucun résultat</div>';
-            } else {
-                results.innerHTML = data.map(r => `
-                    ${r.matches.slice(0, 3).map(m => `
-                        <div class="search-result-item"
-                             onclick="openFile('${r.agent_id}', '${r.file_path}', '${r.file_label}')">
-                            <div class="search-result-agent">${r.agent_name}</div>
-                            <div class="search-result-file">${r.file_label}</div>
-                            <div class="search-result-line">L${m.line}: ${escapeHtml(m.text)}</div>
-                        </div>
-                    `).join('')}
-                `).join('');
-            }
-            results.classList.add('active');
-        }
-
-        // === FILE GUIDES — description + bonnes pratiques par type de fichier ===
-        const FILE_GUIDES = {
-            'SOUL.md': {
-                icon: '🧬',
-                title: 'SOUL.md — Personnalité et règles de l\'agent',
-                desc: 'C\'est le fichier le plus important. Il définit QUI est l\'agent : son nom, sa personnalité, son rôle, ses compétences, ses règles absolues et son style de communication. C\'est le "cerveau" de l\'agent — tout ce qu\'il lit en premier à chaque conversation.',
-                tips: [
-                    { text: '✍️ Écrire en Markdown structuré (## sections)', type: '' },
-                    { text: '🎯 Être précis sur le rôle et les limites', type: '' },
-                    { text: '⚠️ Les règles absolues sont TOUJOURS respectées', type: 'warning' },
-                    { text: '🗣️ Définir le ton (formel, décontracté, technique)', type: '' },
-                    { text: '🚫 Ne pas mettre de données sensibles ici', type: 'danger' },
-                    { text: '📏 Garder < 5000 caractères pour rester efficace', type: 'warning' },
-                ]
-            },
-            'MEMORY.md': {
-                icon: '🧠',
-                title: 'MEMORY.md — Mémoire persistante de l\'agent',
-                desc: 'Ce fichier contient les notes que l\'agent a prises au fil des conversations. Il est injecté dans CHAQUE conversation comme contexte. L\'agent y stocke des faits durables : infos sur l\'environnement, conventions, leçons apprises. C\'est sa "mémoire à long terme".',
-                tips: [
-                    { text: '📐 Format : faits déclaratifs, pas d\'instructions', type: '' },
-                    { text: '🧹 Supprimer les infos obsolètes régulièrement', type: 'warning' },
-                    { text: '⚡ Injecté à CHAQUE tour — garder compact', type: 'warning' },
-                    { text: '❌ Pas de logs, pas de TODO, pas de tâches terminées', type: 'danger' },
-                    { text: '✅ Infos serveur, projets, conventions, préférences', type: '' },
-                    { text: '📊 Limite de taille configurée dans config.yaml', type: '' },
-                ]
-            },
-            'USER.md': {
-                icon: '👤',
-                title: 'USER.md — Profil de l\'utilisateur (toi, JB)',
-                desc: 'Ce fichier décrit QUI tu es pour l\'agent : ton nom, tes préférences, ta timezone, ton style de communication. L\'agent le lit à chaque conversation pour s\'adapter à toi. C\'est comme une fiche contact enrichie.',
-                tips: [
-                    { text: '👋 Nom, surnom, pronoms, timezone', type: '' },
-                    { text: '💬 Style préféré (formel, bref, détaillé)', type: '' },
-                    { text: '🔧 Niveau technique (dev, non-dev, semi-technique)', type: '' },
-                    { text: '🚫 Ce que tu n\'aimes PAS (pet peeves)', type: '' },
-                    { text: '📱 Canaux de communication (Telegram, etc.)', type: '' },
-                    { text: '📏 Garder concis — pas plus de 500 caractères', type: 'warning' },
-                ]
-            },
-            'config.yaml': {
-                icon: '⚙️',
-                title: 'config.yaml — Configuration technique de l\'agent',
-                desc: 'Configuration technique : modèle IA utilisé (Opus, Sonnet, Haiku), provider, timeouts, toolsets activés, personnalités. C\'est le "moteur" de l\'agent. ⚠️ Modifier avec précaution — une erreur YAML peut empêcher l\'agent de démarrer.',
-                tips: [
-                    { text: '🤖 model.default = modèle IA (opus, sonnet, haiku)', type: '' },
-                    { text: '⏱️ gateway_timeout = temps max d\'une conversation', type: '' },
-                    { text: '🔌 toolsets = outils disponibles pour l\'agent', type: '' },
-                    { text: '⚠️ Respecter l\'indentation YAML (2 espaces)', type: 'warning' },
-                    { text: '🚫 NE PAS toucher aux champs inconnus', type: 'danger' },
-                    { text: '🔄 L\'agent doit être redémarré après modification', type: 'warning' },
-                ]
-            },
-            '_dated_memory': {
-                icon: '📅',
-                title: 'Souvenir daté — Archive de conversation',
-                desc: 'Ce fichier est un résumé automatique d\'une conversation passée. L\'agent peut le consulter via session_search pour se rappeler de ce qui a été fait. Ces fichiers sont des archives — les modifier ne change rien au comportement de l\'agent.',
-                tips: [
-                    { text: '📖 Archive en lecture seule recommandée', type: '' },
-                    { text: '🗑️ Peut être supprimé sans impact sur l\'agent', type: '' },
-                    { text: '📅 Format : YYYY-MM-DD.md', type: '' },
-                    { text: '💡 Utile pour retrouver ce qui a été fait tel jour', type: '' },
-                ]
-            }
-        };
-
-        function getFileGuide(filePath) {
-            const name = filePath.split('/').pop();
-            if (FILE_GUIDES[name]) return FILE_GUIDES[name];
-            if (/^20\d{2}-\d{2}-\d{2}\.md$/.test(name)) return FILE_GUIDES['_dated_memory'];
-            return null;
-        }
-
-        function showBanner(filePath) {
-            const guide = getFileGuide(filePath);
-            const banner = document.getElementById('file-info-banner');
-            if (!guide) { banner.classList.remove('show'); return; }
-
-            document.getElementById('file-info-icon').textContent = guide.icon;
-            document.getElementById('file-info-title').textContent = guide.title;
-            document.getElementById('file-info-desc').textContent = guide.desc;
-            document.getElementById('file-info-tips').innerHTML = guide.tips.map(t =>
-                `<span class="file-info-tip ${t.type}">${t.text}</span>`
-            ).join('');
-            banner.classList.add('show');
-        }
-
-        function closeBanner() {
-            document.getElementById('file-info-banner').classList.remove('show');
-        }
-
-        // === UI HELPERS ===
-        function updateEditorUI() {
-            const toolbar = document.getElementById('editor-toolbar');
-            const path = document.getElementById('editor-path');
-            if (state.activeTab !== null) {
-                const tab = state.openTabs[state.activeTab];
-                toolbar.style.display = 'flex';
-                const agent = state.agents.find(a => a.id === tab.agent_id);
-                path.textContent = `${agent?.emoji || ''} ${agent?.name || tab.agent_id} → ${tab.file_path}`;
-                updateSaveButton();
-            } else {
-                toolbar.style.display = 'none';
-            }
-        }
-
-        function updateSaveButton() {
-            const btn = document.getElementById('btn-save');
-            if (state.activeTab === null) return;
-            const tab = state.openTabs[state.activeTab];
-            btn.disabled = tab.modified === tab.original;
-        }
-
-        function highlightActiveFile() {
-            document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
-            if (state.activeTab !== null) {
-                const tab = state.openTabs[state.activeTab];
-                const id = `file-${tab.agent_id}-${tab.file_path.replace(/[\/\.]/g, '-')}`;
-                document.getElementById(id)?.classList.add('active');
-            }
-        }
-
-        function showEmptyState() {
-            document.getElementById('empty-state').style.display = 'flex';
-            document.getElementById('editor-toolbar').style.display = 'none';
-            document.getElementById('file-info-banner').classList.remove('show');
-            if (state.editor) state.editor.getModel()?.setValue('');
-        }
-        function hideEmptyState() {
-            document.getElementById('empty-state').style.display = 'none';
-        }
-
-        function formatSize(bytes) {
-            if (bytes < 1024) return `${bytes} B`;
-            return `${(bytes / 1024).toFixed(1)} KB`;
-        }
-
-        function escapeHtml(text) {
-            const d = document.createElement('div');
-            d.textContent = text;
-            return d.innerHTML;
-        }
-
-        function toast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const el = document.createElement('div');
-            el.className = `toast toast-${type}`;
-            el.textContent = message;
-            container.appendChild(el);
-            setTimeout(() => el.remove(), 4000);
-        }
-
-        // === BOOT ===
-        checkAuth();
-    </script>
+// ===== INIT =====
+async function init(){await loadAgents();renderSidebar();if(!S.editorReady)initEditor();initSearch();}
+checkAuth();
+</script>
 </body>
 </html>
