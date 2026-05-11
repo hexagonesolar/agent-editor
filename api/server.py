@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="Agent Files Manager", version="1.0", root_path="/editor")
+app = FastAPI(title="Agent Files Manager", version="1.0", root_path="/editor-preview")
 
 # CORS pour le frontend
 app.add_middleware(
