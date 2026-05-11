@@ -1,20 +1,22 @@
 """
 Agent Files Manager — Backend FastAPI
 Permet de lister, lire et éditer les fichiers .md et config.yaml des agents Hermes connectés.
+Auth par session cookie (pas de basic auth popup).
 """
 
 import os
 import shutil
 import json
+import secrets
+import hashlib
 from datetime import datetime
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request, Response, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="Agent Files Manager", version="1.0", root_path="/editor-preview")
+app = FastAPI(title="Agent Files Manager", version="1.1")
 
 # CORS pour le frontend
 app.add_middleware(
@@ -23,6 +25,90 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# === AUTH ===
+# Credentials stockés dans un fichier config (pas en dur)
+AUTH_CONFIG = Path(__file__).parent / "auth.json"
+
+def load_auth_config():
+    """Charge les credentials depuis auth.json"""
+    if AUTH_CONFIG.exists():
+        return json.loads(AUTH_CONFIG.read_text())
+    # Config par défaut — à personnaliser
+    default = {
+        "users": {
+            "jb": {"password_hash": hashlib.sha256("hexagone2026".encode()).hexdigest(), "role": "admin"}
+        },
+        "session_secret": secrets.token_hex(32),
+    }
+    AUTH_CONFIG.write_text(json.dumps(default, indent=2))
+    return default
+
+AUTH = load_auth_config()
+
+# Sessions en mémoire (simple, suffisant pour un outil interne)
+active_sessions: dict[str, dict] = {}
+
+def verify_password(username: str, password: str) -> bool:
+    users = AUTH.get("users", {})
+    user = users.get(username)
+    if not user:
+        return False
+    return user["password_hash"] == hashlib.sha256(password.encode()).hexdigest()
+
+def get_current_user(request: Request) -> dict:
+    """Vérifie la session cookie. Retourne le user ou lève 401."""
+    session_id = request.cookies.get("session_id")
+    if not session_id or session_id not in active_sessions:
+        raise HTTPException(401, "Non authentifié")
+    return active_sessions[session_id]
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/login")
+def login(req: LoginRequest, response: Response):
+    """Authentification — retourne un cookie de session."""
+    if not verify_password(req.username, req.password):
+        raise HTTPException(401, "Identifiants incorrects")
+
+    session_id = secrets.token_hex(32)
+    active_sessions[session_id] = {
+        "username": req.username,
+        "role": AUTH["users"][req.username]["role"],
+        "login_time": datetime.now().isoformat(),
+    }
+
+    response = JSONResponse({"status": "ok", "username": req.username})
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=86400 * 7,  # 7 jours
+    )
+    return response
+
+@app.post("/api/logout")
+def logout(request: Request, response: Response):
+    session_id = request.cookies.get("session_id")
+    if session_id and session_id in active_sessions:
+        del active_sessions[session_id]
+    response = JSONResponse({"status": "ok"})
+    response.delete_cookie("session_id")
+    return response
+
+@app.get("/api/me")
+def get_me(request: Request):
+    """Vérifie si l'utilisateur est connecté."""
+    session_id = request.cookies.get("session_id")
+    if not session_id or session_id not in active_sessions:
+        raise HTTPException(401, "Non authentifié")
+    user = active_sessions[session_id]
+    return {"username": user["username"], "role": user["role"]}
+
 
 # === Configuration des agents connectés ===
 HERMES_BASE = Path("/home/jb/.hermes")
@@ -107,10 +193,10 @@ def get_agent_files(agent_id: str) -> list:
     return files
 
 
-# === Routes API ===
+# === Routes API (protégées par auth) ===
 
 @app.get("/api/agents")
-def list_agents():
+def list_agents(user: dict = Depends(get_current_user)):
     """Liste les agents connectés avec leurs fichiers."""
     result = []
     for agent_id, agent in CONNECTED_AGENTS.items():
@@ -126,13 +212,12 @@ def list_agents():
 
 
 @app.get("/api/agents/{agent_id}/files/{file_path:path}")
-def read_file(agent_id: str, file_path: str):
+def read_file(agent_id: str, file_path: str, user: dict = Depends(get_current_user)):
     """Lire le contenu d'un fichier agent."""
     agent = CONNECTED_AGENTS.get(agent_id)
     if not agent:
         raise HTTPException(404, f"Agent '{agent_id}' non trouvé")
 
-    # Sécurité : empêcher les path traversal
     if ".." in file_path:
         raise HTTPException(400, "Chemin invalide")
 
@@ -159,17 +244,15 @@ class SaveRequest(BaseModel):
 
 
 @app.put("/api/agents/{agent_id}/files/{file_path:path}")
-def save_file(agent_id: str, file_path: str, req: SaveRequest):
+def save_file(agent_id: str, file_path: str, req: SaveRequest, user: dict = Depends(get_current_user)):
     """Sauvegarder un fichier agent (avec backup automatique)."""
     agent = CONNECTED_AGENTS.get(agent_id)
     if not agent:
         raise HTTPException(404, f"Agent '{agent_id}' non trouvé")
 
-    # Sécurité : empêcher les path traversal
     if ".." in file_path:
         raise HTTPException(400, "Chemin invalide")
 
-    # Vérifier que c'est un fichier autorisé
     allowed_extensions = {".md", ".yaml", ".yml"}
     ext = Path(file_path).suffix.lower()
     if ext not in allowed_extensions:
@@ -187,7 +270,6 @@ def save_file(agent_id: str, file_path: str, req: SaveRequest):
         except Exception as e:
             raise HTTPException(500, f"Erreur backup : {e}")
 
-    # Écriture du fichier
     try:
         filepath.parent.mkdir(parents=True, exist_ok=True)
         filepath.write_text(req.content, encoding="utf-8")
@@ -205,7 +287,7 @@ def save_file(agent_id: str, file_path: str, req: SaveRequest):
 
 
 @app.get("/api/search")
-def search_files(q: str):
+def search_files(q: str, user: dict = Depends(get_current_user)):
     """Rechercher un texte dans tous les fichiers des agents connectés."""
     if len(q) < 2:
         raise HTTPException(400, "Requête trop courte (min 2 caractères)")
@@ -218,7 +300,6 @@ def search_files(q: str):
                 try:
                     content = filepath.read_text(encoding="utf-8")
                     if q.lower() in content.lower():
-                        # Trouver les lignes correspondantes
                         lines = content.split("\n")
                         matches = []
                         for i, line in enumerate(lines):
@@ -252,7 +333,6 @@ def serve_static(path: str):
     file = STATIC_DIR / path
     if file.exists() and file.is_file():
         return FileResponse(file)
-    # Fallback vers index.html pour SPA
     index = STATIC_DIR / "index.html"
     if index.exists():
         return FileResponse(index)

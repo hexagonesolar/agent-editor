@@ -16,6 +16,7 @@
             --text-muted: #5c6478;
             --accent: #6366f1;
             --accent-hover: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
             --success: #22c55e;
             --warning: #eab308;
             --danger: #ef4444;
@@ -33,12 +34,116 @@
             overflow: hidden;
         }
 
-        /* === LAYOUT === */
-        .app {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            grid-template-rows: 56px 1fr;
+        /* === LOGIN PAGE === */
+        .login-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             height: 100vh;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
+        }
+        .login-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 400px;
+            max-width: 90vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 40px;
+        }
+        .login-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 32px;
+        }
+        .login-field {
+            margin-bottom: 16px;
+        }
+        .login-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .login-field input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .login-field input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+        .login-btn:hover { background: var(--accent-hover); }
+        .login-btn:active { transform: scale(0.98); }
+        .login-btn:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+        .login-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+        }
+        .login-error.show { display: block; }
+
+        /* === APP LAYOUT === */
+        .app {
+            display: none;
+            grid-template-columns: 300px 1fr;
+            grid-template-rows: 56px 1fr 24px;
+            height: 100vh;
+        }
+        .app.active {
+            display: grid;
         }
 
         /* === HEADER === */
@@ -73,6 +178,40 @@
             align-items: center;
             gap: 12px;
         }
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .header-user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+        .btn-logout {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-logout:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
 
         /* === SEARCH === */
         .search-box {
@@ -88,6 +227,7 @@
             width: 260px;
             outline: none;
             transition: border-color 0.2s;
+            font-family: inherit;
         }
         .search-box input:focus {
             border-color: var(--accent);
@@ -113,6 +253,7 @@
             overflow-y: auto;
             z-index: 100;
             display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
         .search-results.active { display: block; }
         .search-result-item {
@@ -129,10 +270,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .search-result-file {
-            font-size: 13px;
-            margin: 2px 0;
-        }
+        .search-result-file { font-size: 13px; margin: 2px 0; }
         .search-result-line {
             font-size: 12px;
             color: var(--text-muted);
@@ -146,9 +284,7 @@
             overflow-y: auto;
             padding: 12px 0;
         }
-        .agent-section {
-            margin-bottom: 8px;
-        }
+        .agent-section { margin-bottom: 8px; }
         .agent-header {
             display: flex;
             align-items: center;
@@ -161,14 +297,8 @@
         .agent-header:hover { background: var(--bg-hover); }
         .agent-emoji { font-size: 20px; }
         .agent-info { flex: 1; }
-        .agent-name {
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .agent-role {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
+        .agent-name { font-size: 14px; font-weight: 600; }
+        .agent-role { font-size: 11px; color: var(--text-muted); }
         .agent-toggle {
             color: var(--text-muted);
             font-size: 12px;
@@ -176,10 +306,7 @@
         }
         .agent-toggle.open { transform: rotate(90deg); }
 
-        .file-list {
-            display: none;
-            padding: 2px 0;
-        }
+        .file-list { display: none; padding: 2px 0; }
         .file-list.open { display: block; }
         .file-item {
             display: flex;
@@ -203,15 +330,8 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .file-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        .file-size {
-            font-size: 11px;
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
+        .file-desc { font-size: 11px; color: var(--text-muted); }
+        .file-size { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
 
         /* === EDITOR AREA === */
         .editor-area {
@@ -219,8 +339,6 @@
             flex-direction: column;
             overflow: hidden;
         }
-
-        /* Tab bar */
         .tab-bar {
             display: flex;
             align-items: center;
@@ -244,6 +362,7 @@
             border-radius: 6px 6px 0 0;
             white-space: nowrap;
             transition: all 0.15s;
+            font-family: inherit;
         }
         .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
         .tab.active {
@@ -259,15 +378,13 @@
         }
         .tab:hover .tab-close { opacity: 1; }
         .tab-modified {
-            width: 6px;
-            height: 6px;
+            width: 6px; height: 6px;
             background: var(--warning);
             border-radius: 50%;
             display: none;
         }
         .tab-modified.show { display: block; }
 
-        /* Editor toolbar */
         .editor-toolbar {
             display: flex;
             align-items: center;
@@ -281,10 +398,7 @@
             color: var(--text-muted);
             font-family: monospace;
         }
-        .editor-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .editor-actions { display: flex; gap: 8px; }
 
         .btn {
             padding: 6px 16px;
@@ -297,30 +411,20 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            font-family: inherit;
         }
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
+        .btn-primary { background: var(--accent); color: white; }
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-primary:disabled {
             background: var(--bg-tertiary);
             color: var(--text-muted);
             cursor: not-allowed;
         }
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
         .btn-secondary:hover { background: var(--bg-hover); }
 
-        /* Monaco container */
-        #editor-container {
-            flex: 1;
-            overflow: hidden;
-        }
+        #editor-container { flex: 1; overflow: hidden; }
 
-        /* Empty state */
         .empty-state {
             display: flex;
             flex-direction: column;
@@ -334,7 +438,7 @@
         .empty-state-text { font-size: 16px; }
         .empty-state-hint { font-size: 13px; }
 
-        /* Toast notifications */
+        /* Toast */
         .toast-container {
             position: fixed;
             bottom: 20px;
@@ -362,7 +466,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Status bar */
         .status-bar {
             background: var(--bg-secondary);
             border-top: 1px solid var(--border);
@@ -374,7 +477,6 @@
             grid-column: 1 / -1;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
@@ -382,8 +484,30 @@
     </style>
 </head>
 <body>
-    <div class="app">
-        <!-- HEADER -->
+
+    <!-- ========== LOGIN ========== -->
+    <div class="login-page" id="login-page">
+        <div class="login-card">
+            <div class="login-logo">⚡</div>
+            <div class="login-title">Agent Files Manager</div>
+            <div class="login-subtitle">Connexion à l'éditeur agents Hermes</div>
+            <div class="login-error" id="login-error"></div>
+            <form onsubmit="handleLogin(event)">
+                <div class="login-field">
+                    <label for="login-user">Utilisateur</label>
+                    <input type="text" id="login-user" autocomplete="username" autofocus placeholder="jb" />
+                </div>
+                <div class="login-field">
+                    <label for="login-pass">Mot de passe</label>
+                    <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••" />
+                </div>
+                <button type="submit" class="login-btn" id="login-btn">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========== APP ========== -->
+    <div class="app" id="app">
         <header class="header">
             <div class="header-left">
                 <span class="header-logo">⚡ Agent Files Manager</span>
@@ -394,13 +518,16 @@
                     <input type="text" id="search-input" placeholder="Rechercher dans les fichiers..." />
                     <div class="search-results" id="search-results"></div>
                 </div>
+                <div class="header-user">
+                    <div class="header-user-avatar" id="user-avatar">JB</div>
+                    <span id="user-name">jb</span>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()">Déconnexion</button>
             </div>
         </header>
 
-        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar"></aside>
 
-        <!-- EDITOR -->
         <main class="editor-area">
             <div class="tab-bar" id="tab-bar"></div>
             <div class="editor-toolbar" id="editor-toolbar" style="display:none;">
@@ -419,14 +546,12 @@
             </div>
         </main>
 
-        <!-- STATUS BAR -->
         <footer class="status-bar">
             <span id="status-left">Prêt</span>
-            <span id="status-right">Agent Files Manager v1.0</span>
+            <span id="status-right">Agent Files Manager v1.1</span>
         </footer>
     </div>
 
-    <!-- TOAST -->
     <div class="toast-container" id="toast-container"></div>
 
     <!-- Monaco Editor CDN -->
@@ -436,40 +561,136 @@
         // === STATE ===
         const state = {
             agents: [],
-            openTabs: [],        // {agent_id, file_path, label, original, modified}
-            activeTab: null,     // index dans openTabs
+            openTabs: [],
+            activeTab: null,
             editor: null,
             editorReady: false,
+            currentUser: null,
         };
 
-        const API_BASE = '/editor-preview/api';
+        // Détecter automatiquement le base path
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const basePath = pathParts.length > 0 ? '/' + pathParts[0] : '';
+        const API_BASE = basePath + '/api';
+
+        // === AUTH ===
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API_BASE}/me`, { credentials: 'same-origin' });
+                if (res.ok) {
+                    const user = await res.json();
+                    state.currentUser = user;
+                    showApp(user);
+                    return true;
+                }
+            } catch (e) {}
+            showLogin();
+            return false;
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const errorEl = document.getElementById('login-error');
+            const username = document.getElementById('login-user').value.trim();
+            const password = document.getElementById('login-pass').value;
+
+            if (!username || !password) {
+                errorEl.textContent = 'Remplis les deux champs';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Connexion...';
+            errorEl.classList.remove('show');
+
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'same-origin',
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    state.currentUser = { username: data.username };
+                    showApp({ username: data.username });
+                } else {
+                    errorEl.textContent = 'Identifiants incorrects';
+                    errorEl.classList.add('show');
+                    document.getElementById('login-pass').value = '';
+                    document.getElementById('login-pass').focus();
+                }
+            } catch (e) {
+                errorEl.textContent = 'Erreur de connexion au serveur';
+                errorEl.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Se connecter';
+            }
+        }
+
+        async function handleLogout() {
+            await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'same-origin' });
+            state.currentUser = null;
+            state.agents = [];
+            state.openTabs = [];
+            state.activeTab = null;
+            showLogin();
+        }
+
+        function showLogin() {
+            document.getElementById('login-page').style.display = 'flex';
+            document.getElementById('app').classList.remove('active');
+            document.getElementById('login-user').focus();
+        }
+
+        function showApp(user) {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('app').classList.add('active');
+            document.getElementById('user-name').textContent = user.username;
+            document.getElementById('user-avatar').textContent = user.username.substring(0, 2).toUpperCase();
+            init();
+        }
 
         // === INIT ===
         async function init() {
             await loadAgents();
             renderSidebar();
-            initEditor();
+            if (!state.editorReady) initEditor();
             initSearch();
         }
 
-        // === API ===
+        // === API (toutes les requêtes avec credentials) ===
+        async function apiFetch(url, options = {}) {
+            options.credentials = 'same-origin';
+            const res = await fetch(url, options);
+            if (res.status === 401) {
+                showLogin();
+                throw new Error('Session expirée');
+            }
+            return res;
+        }
+
         async function loadAgents() {
             try {
-                const res = await fetch(`${API_BASE}/agents`);
+                const res = await apiFetch(`${API_BASE}/agents`);
                 state.agents = await res.json();
             } catch (e) {
-                toast('Erreur de connexion à l\'API', 'error');
+                if (e.message !== 'Session expirée') toast('Erreur de connexion à l\'API', 'error');
             }
         }
 
         async function fetchFile(agentId, filePath) {
-            const res = await fetch(`${API_BASE}/agents/${agentId}/files/${filePath}`);
+            const res = await apiFetch(`${API_BASE}/agents/${agentId}/files/${filePath}`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return await res.json();
         }
 
         async function saveFileToServer(agentId, filePath, content) {
-            const res = await fetch(`${API_BASE}/agents/${agentId}/files/${filePath}`, {
+            const res = await apiFetch(`${API_BASE}/agents/${agentId}/files/${filePath}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content }),
@@ -507,10 +728,7 @@
                 </div>
             `).join('');
 
-            // Ouvrir le premier agent par défaut
-            if (state.agents.length > 0) {
-                toggleAgent(state.agents[0].id);
-            }
+            if (state.agents.length > 0) toggleAgent(state.agents[0].id);
         }
 
         function toggleAgent(agentId) {
@@ -536,19 +754,16 @@
         }
 
         function switchTab(index) {
-            // Sauvegarder le contenu actuel
             if (state.activeTab !== null && state.editor) {
                 state.openTabs[state.activeTab].modified = state.editor.getValue();
             }
             state.activeTab = index;
             const tab = state.openTabs[index];
-
             if (state.editor) {
                 const lang = tab.file_path.endsWith('.yaml') ? 'yaml' : 'markdown';
                 monaco.editor.setModelLanguage(state.editor.getModel(), lang);
                 state.editor.setValue(tab.modified);
             }
-
             updateEditorUI();
             renderTabs();
             highlightActiveFile();
@@ -572,20 +787,15 @@
 
         // === OPEN FILE ===
         async function openFile(agentId, filePath, label) {
-            // Vérifier si déjà ouvert
             const existing = state.openTabs.findIndex(
                 t => t.agent_id === agentId && t.file_path === filePath
             );
-            if (existing !== -1) {
-                switchTab(existing);
-                return;
-            }
+            if (existing !== -1) { switchTab(existing); return; }
 
             try {
                 document.getElementById('status-left').textContent = `Chargement de ${label}...`;
                 const data = await fetchFile(agentId, filePath);
 
-                // Sauvegarder le contenu de l'onglet actuel
                 if (state.activeTab !== null && state.editor) {
                     state.openTabs[state.activeTab].modified = state.editor.getValue();
                 }
@@ -622,15 +832,12 @@
             if (state.activeTab === null) return;
             const tab = state.openTabs[state.activeTab];
             const content = state.editor.getValue();
-
             try {
                 document.getElementById('btn-save').disabled = true;
                 document.getElementById('btn-save').innerHTML = '⏳ Sauvegarde...';
-
                 const result = await saveFileToServer(tab.agent_id, tab.file_path, content);
                 tab.original = content;
                 tab.modified = content;
-
                 toast(`${tab.label} sauvegardé ✅`, 'success');
                 renderTabs();
                 updateSaveButton();
@@ -657,7 +864,6 @@
         function initEditor() {
             require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
             require(['vs/editor/editor.main'], function () {
-                // Thème custom sombre
                 monaco.editor.defineTheme('agent-dark', {
                     base: 'vs-dark',
                     inherit: true,
@@ -685,7 +891,6 @@
                     bracketPairColorization: { enabled: true },
                 });
 
-                // Détecter les changements
                 state.editor.onDidChangeModelContent(() => {
                     if (state.activeTab !== null) {
                         state.openTabs[state.activeTab].modified = state.editor.getValue();
@@ -694,7 +899,6 @@
                     }
                 });
 
-                // Raccourci Ctrl+S
                 state.editor.addAction({
                     id: 'save-file',
                     label: 'Sauvegarder',
@@ -716,20 +920,14 @@
                 clearTimeout(debounce);
                 debounce = setTimeout(async () => {
                     const q = input.value.trim();
-                    if (q.length < 2) {
-                        results.classList.remove('active');
-                        return;
-                    }
+                    if (q.length < 2) { results.classList.remove('active'); return; }
                     try {
-                        const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`);
+                        const res = await apiFetch(`${API_BASE}/search?q=${encodeURIComponent(q)}`);
                         const data = await res.json();
                         renderSearchResults(data);
-                    } catch (e) {
-                        console.error(e);
-                    }
+                    } catch (e) { console.error(e); }
                 }, 300);
             });
-
             input.addEventListener('blur', () => {
                 setTimeout(() => results.classList.remove('active'), 200);
             });
@@ -814,8 +1012,8 @@
             setTimeout(() => el.remove(), 4000);
         }
 
-        // === INIT ===
-        init();
+        // === BOOT ===
+        checkAuth();
     </script>
 </body>
 </html>
